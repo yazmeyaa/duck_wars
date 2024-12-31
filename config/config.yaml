@@ -1,9 +1,0 @@
-database:
-  host: "localhost"
-  port: 5432
-  username: "postgres"
-  password: "enter1zexlol1"
-  database: "game_test"
-  ssl: false
-jwt:
-  secret: "C9z!!lk$cxz"
