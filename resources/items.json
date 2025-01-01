@@ -1,0 +1,106 @@
+{
+    "tree_stick": {
+        "id": "tree_stick",
+        "type": "item",
+        "name": "Tree stick",
+        "description": "This was once part of a tree",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.1
+    },
+    "wood_log": {
+        "id": "wood_log",
+        "type": "item",
+        "name": "Wood log",
+        "description": "Piece of wood",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.25
+    },
+    "wooden_beams": {
+        "id": "wooden_beams",
+        "type": "item",
+        "name": "Wooden beams",
+        "description": "Processed wood",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.25
+    },
+    "stone": {
+        "id": "stone",
+        "type": "item",
+        "name": "Stone",
+        "description": "Just a regular stone",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.2
+    },
+    "tree_fibers": {
+        "id": "tree_fibers",
+        "type": "item",
+        "name": "Tree fibers",
+        "description": "Fibers obtained from felling trees",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.1
+    },
+    "rope": {
+        "id": "rope",
+        "type": "item",
+        "name": "Rope",
+        "description": "A simple rope, a necessary thing in everyday life",
+        "soldable": true,
+        "craftable": true,
+        "usedInCraft": true,
+        "marketCost": 1
+    },
+    "wooden_sword": {
+        "id": "wooden_sword",
+        "type": "equipment",
+        "name": "Wooden sword",
+        "description": "A sword made of wood",
+        "soldable": true,
+        "craftable": true,
+        "usedInCraft": false,
+        "marketCost": 2,
+        "attributes": {
+            "attack": 2,
+            "criticalChacne": 0.05
+        }
+    },
+    "animal_skin": {
+        "id": "animal_skin",
+        "type": "item",
+        "name": "Animal skin",
+        "description": "Skin taken from an animal",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.4
+    },
+    "leather": {
+        "id": "animal_skin",
+        "type": "item",
+        "name": "Animal skin",
+        "description": "Skin taken from an animal",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.6
+    },
+    "strips_of_leather": {
+        "id": "animal_skin",
+        "type": "item",
+        "name": "Animal skin",
+        "description": "Skin taken from an animal",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true,
+        "marketCost": 0.2
+    }
+}

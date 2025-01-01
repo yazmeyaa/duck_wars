@@ -1,0 +1,46 @@
+{
+    "rope": {
+        "item_id": "rope",
+        "recipes": [
+            {
+                "quantity": 1,
+                "energyCost": 1,
+                "items": [
+                    {
+                        "item_id": "tree_fiber",
+                        "quantity": 5
+                    }
+                ]
+            },
+            {
+                "quantity": 1,
+                "energyCost": 1,
+                "items": [
+                    {
+                        "item_id": "strips_of_leather",
+                        "quantity": 4
+                    }
+                ]
+            }
+        ]
+    },
+    "wooden_sword": {
+        "item_id": "wooden_sword",
+        "recipes": [
+            {
+                "quantity": 1,
+                "energyCost": 2,
+                "items": [
+                    {
+                        "item_id": "rope",
+                        "quantity": 1
+                    },
+                    {
+                        "item_id": "wooden_beams",
+                        "quantity": 2
+                    }
+                ]
+            }
+        ]
+    }
+}
