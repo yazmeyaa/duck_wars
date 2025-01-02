@@ -1,0 +1,27 @@
+{
+    "rope": {
+        "item_id": "rope",
+        "recipes": [
+            {
+                "quantity": 1,
+                "energy_cost": 1,
+                "items": [
+                    {
+                        "item_id": "tree_fiber",
+                        "quantity": 5
+                    }
+                ]
+            },
+            {
+                "quantity": 1,
+                "energy_cost": 1,
+                "items": [
+                    {
+                        "item_id": "strips_of_leather",
+                        "quantity": 4
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "wooden_sword": {
+        "item_id": "wooden_sword",
+        "attack": {
+            "min": 2,
+            "max": 4
+        },
+        "critical_chacne": 0.05,
+        "attack_speed": 2
+    }
+}

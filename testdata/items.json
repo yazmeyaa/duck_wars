@@ -1,0 +1,11 @@
+{
+    "tree_stick": {
+        "id": "tree_stick",
+        "type": "item",
+        "name": "Tree stick",
+        "description": "This was once part of a tree",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true
+    }
+}

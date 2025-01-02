@@ -4,7 +4,7 @@
         "recipes": [
             {
                 "quantity": 1,
-                "energyCost": 1,
+                "energy_cost": 1,
                 "items": [
                     {
                         "item_id": "tree_fiber",
@@ -14,7 +14,7 @@
             },
             {
                 "quantity": 1,
-                "energyCost": 1,
+                "energy_cost": 1,
                 "items": [
                     {
                         "item_id": "strips_of_leather",
@@ -29,7 +29,7 @@
         "recipes": [
             {
                 "quantity": 1,
-                "energyCost": 2,
+                "energy_cost": 2,
                 "items": [
                     {
                         "item_id": "rope",
