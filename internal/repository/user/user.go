@@ -20,7 +20,7 @@ var (
 type UserRepository interface {
 	Create(ctx context.Context, data CreateUserDTO) (int, error)
 	Delete(ctx context.Context, id int) error
-	Update(ctx context.Context, userID int, data UpdateUserDTO) error
+	// Update(ctx context.Context, userID int, data UpdateUserDTO) error
 	GetByID(ctx context.Context, id int) (*models.User, error)
 	GetByTelegramID(ctx context.Context, id int64) (*models.User, error)
 }
@@ -34,7 +34,6 @@ func (u *userRepository) GetByTelegramID(ctx context.Context, id int64) (*models
 	row := sq.Select(
 		"id",
 		"telegram_id",
-		"username",
 		"updated_at",
 		"created_at",
 	).
@@ -49,7 +48,6 @@ func (u *userRepository) GetByTelegramID(ctx context.Context, id int64) (*models
 	if err := row.Scan(
 		&user.ID,
 		&user.TelegramID,
-		&user.Username,
 		&user.UpdatedAt,
 		&user.CreatedAt,
 	); err != nil {
@@ -66,7 +64,7 @@ func (u *userRepository) GetByTelegramID(ctx context.Context, id int64) (*models
 func (u *userRepository) Create(ctx context.Context, data CreateUserDTO) (int, error) {
 	row := sq.Insert(dbName).
 		Columns("telegram_id", "username").
-		Values(data.TelegramID, data.Username).
+		Values(data.TelegramID).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		RunWith(u.db).
@@ -105,7 +103,6 @@ func (u *userRepository) GetByID(ctx context.Context, id int) (*models.User, err
 	row := sq.Select(
 		"id",
 		"telegram_id",
-		"username",
 		"updated_at",
 		"created_at",
 	).
@@ -120,7 +117,6 @@ func (u *userRepository) GetByID(ctx context.Context, id int) (*models.User, err
 	if err := row.Scan(
 		&user.ID,
 		&user.TelegramID,
-		&user.Username,
 		&user.UpdatedAt,
 		&user.CreatedAt,
 	); err != nil {
@@ -131,11 +127,6 @@ func (u *userRepository) GetByID(ctx context.Context, id int) (*models.User, err
 	}
 
 	return &user, nil
-}
-
-// Update implements UserRepository.
-func (u *userRepository) Update(ctx context.Context, userID int, data UpdateUserDTO) error {
-	panic("unimplemented")
 }
 
 func New(db *sql.DB) UserRepository {
