@@ -1,0 +1,22 @@
+{
+    "forest": {
+        "adventure_id": "forest",
+        "title": "Forest",
+        "success_chance": 0.9,
+        "description": "Go to the forest, you can find some resources there. Safe, but you may encounter creatures.",
+        "duration": 300,
+        "energy_cost": 1,
+        "success_messages": [],
+        "failure_messages": []
+    },
+    "stone_mine": {
+        "adventure_id": "stone_mine",
+        "title": "Stone mine",
+        "success_chance": 0.6,
+        "description": "",
+        "duration": 420,
+        "energy_cost": 1,
+        "success_messages": [],
+        "failure_messages": []
+    }
+}

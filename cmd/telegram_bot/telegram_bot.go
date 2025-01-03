@@ -12,7 +12,7 @@ import (
 	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/pkg/config"
-	"github.com/yazmeyaa/duck_wars/pkg/db"
+	"github.com/yazmeyaa/duck_wars/pkg/database"
 	"github.com/yazmeyaa/duck_wars/pkg/telegram_bot"
 )
 
@@ -46,7 +46,7 @@ func main() {
 		return
 	}
 
-	db, err := db.New(cfg)
+	db, err := database.New(cfg)
 
 	if err != nil {
 		logger.Error("Cannot open DB connection", "error", err.Error())

@@ -35,6 +35,24 @@
         "craftable": false,
         "usedInCraft": true
     },
+    "coal": {
+        "id": "coal",
+        "type": "item",
+        "name": "Coal",
+        "description": "Very valuable resource for blacksmiths.",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true
+    },
+    "copper_ore": {
+        "id": "copper_ore",
+        "type": "item",
+        "name": "Copper ore",
+        "description": "Can be melted down into copper ingots",
+        "soldable": true,
+        "craftable": false,
+        "usedInCraft": true
+    },
     "tree_fibers": {
         "id": "tree_fibers",
         "type": "item",
