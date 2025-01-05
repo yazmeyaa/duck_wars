@@ -9,7 +9,9 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/yazmeyaa/duck_wars/internal/bot/bot_handlers"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
+	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
 	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
+	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/pkg/config"
 	"github.com/yazmeyaa/duck_wars/pkg/database"
@@ -54,7 +56,9 @@ func main() {
 	}
 
 	userRepository := user_repository.New(db)
-	userService := user_service.New(logger, userRepository)
+	characterRepository := character_repository.New(db)
+	userService := user_service.New(logger, userRepository, characterRepository)
+	characterService := character_service.New(characterRepository, logger)
 
 	if err != nil {
 		if errors.Is(err, telegram_bot.ErrTokenNotProvided) {
@@ -71,7 +75,7 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
-	updatesHandler := bot_handlers.New(logger, userService)
+	updatesHandler := bot_handlers.New(logger, userService, characterService)
 
 	for update := range updates {
 		updatesHandler.HandleUpdate(bot, &update)

@@ -22,10 +22,11 @@ type DatabaseConfig struct {
 	Port     int
 	Username string
 	Password string
+	Database string
 }
 
 func (d *DatabaseConfig) DSN() string {
-	return fmt.Sprintf("postgresql://%s:%s@%s:%d", d.Username, d.Password, d.Host, d.Port)
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", d.Username, d.Password, d.Host, d.Port, d.Database)
 }
 
 func New() *Config {
@@ -40,6 +41,7 @@ func New() *Config {
 			Port:     getEnvAsInt("DB_PORT", 5432),
 			Username: getEnv("DB_USERNAME", "postgres"),
 			Password: getEnv("DB_PASSWORD", "admin"),
+			Database: getEnv("DB_DATABASE", "duckwars"),
 		},
 	}
 }

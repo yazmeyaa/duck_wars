@@ -63,8 +63,9 @@ func (u *userRepository) GetByTelegramID(ctx context.Context, id int64) (*models
 // Create implements UserRepository.
 func (u *userRepository) Create(ctx context.Context, data CreateUserDTO) (int, error) {
 	row := sq.Insert(dbName).
-		Columns("telegram_id", "username").
+		Columns("telegram_id").
 		Values(data.TelegramID).
+		Suffix("ON CONFLICT (telegram_id) DO UPDATE SET telegram_id = EXCLUDED.telegram_id").
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
 		RunWith(u.db).

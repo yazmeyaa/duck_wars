@@ -5,16 +5,20 @@ import (
 	"log/slog"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 )
 
 type Handler struct {
-	log         *slog.Logger
-	userService user_service.UserService
+	log              *slog.Logger
+	userService      user_service.UserService
+	characterService *character_service.CharacterService
 }
 
 func (h *Handler) handleCommand(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 	switch update.Message.Command() {
+	case "start":
+		h.handleStartCommand(bot, update)
 	default:
 		fmt.Printf("%d\n", update.Message.From.ID)
 		h.log.Info(update.Message.Command())
@@ -34,9 +38,10 @@ func (h *Handler) HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 	}
 }
 
-func New(logger *slog.Logger, userService user_service.UserService) *Handler {
+func New(logger *slog.Logger, userService user_service.UserService, characterService *character_service.CharacterService) *Handler {
 	return &Handler{
-		log:         logger,
-		userService: userService,
+		log:              logger,
+		userService:      userService,
+		characterService: characterService,
 	}
 }
