@@ -23,10 +23,12 @@ var (
 )
 
 var (
-	testDataPath             = filepath.Join("resources")
-	craftFilePath            = filepath.Join(testDataPath, "crafts.json")
-	itemsFilePath            = filepath.Join(testDataPath, "items.json")
-	weaponAttributesFilePath = filepath.Join(testDataPath, "weapon_attributes.json")
+	testDataPath              = filepath.Join("resources")
+	craftFilePath             = filepath.Join(testDataPath, "crafts.json")
+	itemsFilePath             = filepath.Join(testDataPath, "items.json")
+	weaponAttributesFilePath  = filepath.Join(testDataPath, "weapon_attributes.json")
+	adventuresFilePath        = filepath.Join(testDataPath, "adventures.json")
+	adventuresRewardsFilePath = filepath.Join(testDataPath, "adventures_rewards.json")
 )
 
 func main() {
@@ -42,6 +44,8 @@ func main() {
 		CraftFile:            craftFilePath,
 		ItemsFile:            itemsFilePath,
 		WeaponAttributesFile: weaponAttributesFilePath,
+		AdventuresFile:       adventuresFilePath,
+		AdventureRewardsFile: adventuresRewardsFilePath,
 	}); err != nil {
 		logger.Error("Error while reading game data files.", "error", err.Error())
 		os.Exit(1)

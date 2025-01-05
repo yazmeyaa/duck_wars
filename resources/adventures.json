@@ -9,9 +9,9 @@
         "success_messages": [],
         "failure_messages": []
     },
-    "stone_mine": {
-        "adventure_id": "stone_mine",
-        "title": "Stone mine",
+    "mountains": {
+        "adventure_id": "mountains",
+        "title": "Mountains",
         "success_chance": 0.6,
         "description": "",
         "duration": 420,

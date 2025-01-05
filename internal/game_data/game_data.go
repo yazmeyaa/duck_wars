@@ -11,6 +11,8 @@ type GameData struct {
 	Items            map[string]Item
 	Crafts           map[string]Craft
 	WeaponAttributes map[string]WeaponAttribute
+	Adventures       map[string]Adventure
+	AdventureRewards map[string]AdventureRewards
 	logger           *slog.Logger
 }
 
@@ -18,6 +20,8 @@ type GameDataConstructor struct {
 	CraftFile            string
 	ItemsFile            string
 	WeaponAttributesFile string
+	AdventuresFile       string
+	AdventureRewardsFile string
 }
 
 func (gd *GameData) Read(props GameDataConstructor) error {
@@ -39,9 +43,23 @@ func (gd *GameData) Read(props GameDataConstructor) error {
 	}
 	gd.logger.Info("Weapon attributes loaded successfully", "entries", len(weaponAttributesData))
 
+	adventuresData, err := readJSONFile[map[string]Adventure](props.AdventuresFile)
+	if err != nil {
+		return err
+	}
+	gd.logger.Info("Adventures loaded successfully", "entries", len(adventuresData))
+
+	adventuresRewardsData, err := readJSONFile[map[string]AdventureRewards](props.AdventureRewardsFile)
+	if err != nil {
+		return err
+	}
+	gd.logger.Info("Adventures rewards loaded successfully", "entries", len(adventuresRewardsData))
+
 	gd.Crafts = craftData
 	gd.Items = itemsData
 	gd.WeaponAttributes = weaponAttributesData
+	gd.Adventures = adventuresData
+	gd.AdventureRewards = adventuresRewardsData
 
 	gd.logger.Info("All game data loaded successfully!")
 
@@ -53,6 +71,7 @@ func NewGameData(logger *slog.Logger) *GameData {
 		Items:            make(map[string]Item),
 		Crafts:           make(map[string]Craft),
 		WeaponAttributes: make(map[string]WeaponAttribute),
+		Adventures:       make(map[string]Adventure),
 		logger:           logger,
 	}
 }

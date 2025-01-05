@@ -1,7 +1,6 @@
 package bot_handlers
 
 import (
-	"fmt"
 	"log/slog"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -19,12 +18,6 @@ func (h *Handler) handleCommand(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 	switch update.Message.Command() {
 	case "start":
 		h.handleStartCommand(bot, update)
-	default:
-		fmt.Printf("%d\n", update.Message.From.ID)
-		h.log.Info(update.Message.Command())
-		msg := tgbotapi.NewMessage(update.FromChat().ID, "Hi!")
-
-		bot.Send(msg)
 	}
 }
 
