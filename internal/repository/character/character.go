@@ -3,6 +3,8 @@ package character_repository
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/yazmeyaa/duck_wars/internal/models"
@@ -90,6 +92,7 @@ func (cr *CharacterRepository) GetByID(ctx context.Context, id int) (*models.Cha
 	).
 		From(dbName).
 		Where(sq.Eq{"id": id}).
+		PlaceholderFormat(sq.Dollar).
 		RunWith(cr.db).
 		QueryRowContext(ctx)
 
@@ -109,4 +112,36 @@ func (cr *CharacterRepository) GetByID(ctx context.Context, id int) (*models.Cha
 	}
 
 	return &char, nil
+}
+
+func (c *CharacterRepository) Update(ctx context.Context, id int, data UpdateCharacterDTO) error {
+	expr := sq.Update(dbName)
+
+	if data.Coins.Valid {
+		expr = expr.Set("coins", data.Coins.Float64)
+	}
+
+	if data.Name.Valid {
+		expr = expr.Set("name", data.Name.String)
+	}
+
+	if data.MaxEnergy.Valid {
+		expr = expr.Set("max_energy", data.MaxEnergy.Int16)
+	}
+
+	if data.Experience.Valid {
+		fmt.Printf("EXP: %f\n", data.Experience.Float64)
+		expr = expr.Set("experience", data.Experience.Float64)
+	}
+
+	if expr == sq.Update(dbName) {
+		return errors.New("no fields to update")
+	}
+
+	_, err := expr.Where(sq.Eq{"id": id}).
+		PlaceholderFormat(sq.Dollar).
+		RunWith(c.db).
+		ExecContext(ctx)
+
+	return err
 }

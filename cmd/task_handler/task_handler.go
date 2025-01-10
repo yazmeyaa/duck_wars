@@ -4,14 +4,27 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
+	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
+	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	"github.com/yazmeyaa/duck_wars/internal/task_handlers"
 	"github.com/yazmeyaa/duck_wars/pkg/config"
 	"github.com/yazmeyaa/duck_wars/pkg/database"
 	"github.com/yazmeyaa/duck_wars/pkg/dispatcher"
 	"github.com/yazmeyaa/duck_wars/pkg/logger"
+	"github.com/yazmeyaa/duck_wars/pkg/telegram_bot"
+)
+
+var (
+	testDataPath              = filepath.Join("resources")
+	craftFilePath             = filepath.Join(testDataPath, "crafts.json")
+	itemsFilePath             = filepath.Join(testDataPath, "items.json")
+	weaponAttributesFilePath  = filepath.Join(testDataPath, "weapon_attributes.json")
+	adventuresFilePath        = filepath.Join(testDataPath, "adventures.json")
+	adventuresRewardsFilePath = filepath.Join(testDataPath, "adventures_rewards.json")
 )
 
 func main() {
@@ -24,7 +37,28 @@ func main() {
 		return
 	}
 	gd := game_data.NewGameData(logger)
-	h := task_handlers.NewTaskHandlersMap(logger, gd)
+	if err := gd.Read(game_data.GameDataConstructor{
+		CraftFile:            craftFilePath,
+		ItemsFile:            itemsFilePath,
+		WeaponAttributesFile: weaponAttributesFilePath,
+		AdventuresFile:       adventuresFilePath,
+		AdventureRewardsFile: adventuresRewardsFilePath,
+	}); err != nil {
+		logger.Error("Error while reading game data files.", "error", err.Error())
+		os.Exit(1)
+		return
+	}
+	bot, err := telegram_bot.New(cfg)
+	if err != nil {
+		logger.Error("Error while create bot instance.", "error", err.Error())
+		os.Exit(1)
+		return
+	}
+
+	charRepo := character_repository.New(db)
+	charService := character_service.New(charRepo, logger)
+
+	h := task_handlers.NewTaskHandlersMap(logger, gd, bot, charService)
 
 	dCtx, cancel := context.WithCancel(context.Background())
 	defer cancel()

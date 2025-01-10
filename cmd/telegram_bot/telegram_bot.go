@@ -15,6 +15,7 @@ import (
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/pkg/config"
 	"github.com/yazmeyaa/duck_wars/pkg/database"
+	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
 	"github.com/yazmeyaa/duck_wars/pkg/telegram_bot"
 )
 
@@ -33,11 +34,18 @@ var (
 
 func main() {
 	cfg := config.New()
+	db, err := database.New(cfg)
+
+	if err != nil {
+		logger.Error("Cannot open DB connection", "error", err.Error())
+		os.Exit(1)
+	}
 	bot, err := telegram_bot.New(cfg)
 	if err != nil {
 		logger.Error("Error while getting telegram bot instance", "error", err.Error())
 		os.Exit(1)
 	}
+	sheduler := sheduler.NewSheduler(db, logger)
 
 	gd := game_data.NewGameData(logger)
 	if err := gd.Read(game_data.GameDataConstructor{
@@ -50,13 +58,6 @@ func main() {
 		logger.Error("Error while reading game data files.", "error", err.Error())
 		os.Exit(1)
 		return
-	}
-
-	db, err := database.New(cfg)
-
-	if err != nil {
-		logger.Error("Cannot open DB connection", "error", err.Error())
-		os.Exit(1)
 	}
 
 	userRepository := user_repository.New(db)
@@ -79,7 +80,7 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
-	updatesHandler := bot_handlers.New(logger, userService, characterService)
+	updatesHandler := bot_handlers.New(logger, gd, userService, characterService, sheduler)
 
 	for update := range updates {
 		updatesHandler.HandleUpdate(bot, &update)

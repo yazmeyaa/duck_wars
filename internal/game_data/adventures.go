@@ -7,12 +7,14 @@ type Adventure struct {
 	Description     string   `json:"description"`
 	Duration        int      `json:"duration"`
 	EnergyCost      int      `json:"energy_cost"`
+	StartMessages   []string `json:"start_messages"`
 	SuccessMessages []string `json:"success_messages"`
 	FailureMessages []string `json:"failure_messages"`
 }
 
 type AdventureRewards struct {
 	AdventureID string   `json:"adventure_id"`
+	Experience  MinMax   `json:"experience"`
 	Rewards     []Reward `json:"rewards"`
 }
 

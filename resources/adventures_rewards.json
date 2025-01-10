@@ -1,6 +1,10 @@
 {
     "forest": {
         "adventure_id": "forest",
+        "experience": {
+            "min": 2,
+            "max": 5
+        },
         "rewards": [
             {
                 "item_id": "tree_stick",
@@ -27,5 +31,13 @@
                 }
             }
         ]
+    },
+    "mountains": {
+        "adventure_id": "mountains",
+        "experience": {
+            "min": 3,
+            "max": 7
+        },
+        "rewards": []
     }
 }

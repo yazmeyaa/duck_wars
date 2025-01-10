@@ -2,21 +2,43 @@
     "forest": {
         "adventure_id": "forest",
         "title": "Forest",
-        "success_chance": 0.9,
+        "success_chance": 0.85,
         "description": "Go to the forest, you can find some resources there. Safe, but you may encounter creatures.",
         "duration": 300,
         "energy_cost": 1,
-        "success_messages": [],
-        "failure_messages": []
+        "start_messages": [],
+        "success_messages": [
+            "You spent some time exploring the forest. It was a productive trip.",
+            "The forest seemed calm today, and your exploration went smoothly.",
+            "You navigated through the trees and had a decent experience.",
+            "Your time in the forest was well-spent, and you feel accomplished."
+        ],
+        "failure_messages": [
+            "You had trouble finding anything useful and decided to return.",
+            "The forest was quiet, but you couldn't make much progress.",
+            "Despite your efforts, the exploration didn't go as planned.",
+            "You wandered around for a while but had to head back empty-handed."
+        ]
     },
     "mountains": {
         "adventure_id": "mountains",
         "title": "Mountains",
         "success_chance": 0.6,
-        "description": "",
+        "description": "Explore the mountains to find rare resources. Dangerous terrain with a higher chance of failure.",
         "duration": 420,
         "energy_cost": 1,
-        "success_messages": [],
-        "failure_messages": []
+        "start_messages": [],
+        "success_messages": [
+            "The climb was challenging, but you made good progress.",
+            "You spent time in the mountains and gained valuable experience.",
+            "Despite the tough terrain, your exploration went better than expected.",
+            "Your journey through the mountains was worth the effort."
+        ],
+        "failure_messages": [
+            "The rough terrain slowed you down, and you had to turn back.",
+            "Your path was blocked, forcing you to cut the exploration short.",
+            "A sudden change in weather made it too risky to continue.",
+            "You tried your best, but the mountains proved too difficult this time."
+        ]
     }
 }
