@@ -12,7 +12,15 @@ import (
 	"github.com/yazmeyaa/duck_wars/pkg/database"
 	"github.com/yazmeyaa/duck_wars/pkg/dispatcher"
 	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
+	"github.com/yazmeyaa/duck_wars/pkg/worker"
 )
+
+func handleTask(ctx context.Context, t models.Task) worker.TaskResult {
+	return worker.TaskResult{
+		ID:     t.ID,
+		Result: models.STATUS_COMPLETED,
+	}
+}
 
 func TestDispatcher(t *testing.T) {
 	stop, cancel := context.WithCancel(context.Background())
@@ -37,12 +45,16 @@ func TestDispatcher(t *testing.T) {
 		SheduledAt: time.Now().Add(time.Second),
 	})
 
+	h := map[string]worker.TaskHandler{
+		"finish_adventure": handleTask,
+	}
+
 	if err != nil {
 		logger.Error(err.Error())
 		t.FailNow()
 		return
 	}
-	d := dispatcher.NewDispatcher(stop, logger, db, 5)
+	d := dispatcher.NewDispatcher(stop, logger, db, h, 5)
 
 	go d.Run()
 

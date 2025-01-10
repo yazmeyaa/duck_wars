@@ -12,12 +12,13 @@ import (
 )
 
 type Dispatcher struct {
-	logger         *slog.Logger
-	db             *sql.DB
-	shutdownCtx    context.Context
-	taskChan       chan models.Task
-	taskResultChan chan worker.TaskResult
-	workers        map[string]*worker.Worker
+	logger          *slog.Logger
+	db              *sql.DB
+	shutdownCtx     context.Context
+	taskChan        chan models.Task
+	taskResultChan  chan worker.TaskResult
+	workers         map[string]*worker.Worker
+	requestInterval int
 }
 
 func (d *Dispatcher) GetTaskChannel() chan models.Task {
@@ -28,24 +29,25 @@ func (d *Dispatcher) GetTaskResultChannel() chan worker.TaskResult {
 	return d.taskResultChan
 }
 
-func NewDispatcher(ctx context.Context, logger *slog.Logger, db *sql.DB, workersCount int) *Dispatcher {
+func NewDispatcher(ctx context.Context, logger *slog.Logger, db *sql.DB, taskHandlers map[string]worker.TaskHandler, workersCount int) *Dispatcher {
 	workers := map[string]*worker.Worker{}
 	taskChannel := make(chan models.Task, 100)
 	taskResultChannel := make(chan worker.TaskResult, 100)
 
 	for range workersCount {
 		ctx, cancel := context.WithCancel(ctx)
-		w := worker.NewWorker(ctx, cancel, taskChannel, taskResultChannel, logger)
+		w := worker.NewWorker(ctx, cancel, taskChannel, taskResultChannel, logger, taskHandlers)
 		workers[w.GetID()] = w
 	}
 
 	return &Dispatcher{
-		logger:         logger,
-		db:             db,
-		shutdownCtx:    ctx,
-		taskChan:       taskChannel,
-		taskResultChan: taskResultChannel,
-		workers:        workers,
+		logger:          logger,
+		db:              db,
+		shutdownCtx:     ctx,
+		taskChan:        taskChannel,
+		taskResultChan:  taskResultChannel,
+		workers:         workers,
+		requestInterval: 1000,
 	}
 }
 
@@ -105,7 +107,7 @@ func (d *Dispatcher) runWorkers() {
 
 func (d *Dispatcher) Run() {
 	d.runWorkers()
-	ticker := time.NewTicker(time.Millisecond * 500)
+	ticker := time.NewTicker(time.Millisecond * time.Duration(d.requestInterval))
 
 	for {
 		select {

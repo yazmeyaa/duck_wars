@@ -16,7 +16,7 @@ func TestWorker(t *testing.T) {
 	taskResultChan := make(chan worker.TaskResult)
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	ctx, cancel := context.WithCancel(context.Background())
-	worker := worker.NewWorker(ctx, cancel, ch, taskResultChan, logger)
+	worker := worker.NewWorker(ctx, cancel, ch, taskResultChan, logger, map[string]worker.TaskHandler{})
 
 	go worker.Run()
 
