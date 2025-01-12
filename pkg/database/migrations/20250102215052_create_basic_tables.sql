@@ -19,17 +19,17 @@ CREATE TABLE IF NOT EXISTS characters (
 );
 
 CREATE TABLE IF NOT EXISTS inventory_items (
-    "id" SERIAL PRIMARY KEY,
     "character_id" INTEGER REFERENCES characters("id") ON DELETE CASCADE NOT NULL,
     "item_id" VARCHAR(255) NOT NULL,
-    "quantity" SMALLINT NOT NULL,
-    "updated_at" TIMESTAMP DEFAULT current_timestamp,
-    "created_at" TIMESTAMP DEFAULT current_timestamp
-)
+    "quantity" SMALLINT NOT NULL
+);
+
+CREATE UNIQUE INDEX unique_item_character ON inventory_items (item_id, character_id);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
+DROP INDEX unique_item_character;
 DROP TABLE IF EXISTS inventory_items;
 DROP TABLE IF EXISTS characters;
 DROP TABLE IF EXISTS users;

@@ -9,7 +9,9 @@ import (
 
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
 	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
+	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
+	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
 	"github.com/yazmeyaa/duck_wars/internal/task_handlers"
 	"github.com/yazmeyaa/duck_wars/pkg/config"
 	"github.com/yazmeyaa/duck_wars/pkg/database"
@@ -57,8 +59,10 @@ func main() {
 
 	charRepo := character_repository.New(db)
 	charService := character_service.New(charRepo, logger)
+	inventoryRepo := inventory_repository.New(db)
+	inventoryService := inventory_service.New(inventoryRepo, logger)
 
-	h := task_handlers.NewTaskHandlersMap(logger, gd, bot, charService)
+	h := task_handlers.NewTaskHandlersMap(logger, gd, bot, charService, inventoryService)
 
 	dCtx, cancel := context.WithCancel(context.Background())
 	defer cancel()

@@ -117,7 +117,6 @@ func (d *Dispatcher) Run() {
 			d.shutdown()
 			return
 		case result := <-d.taskResultChan:
-			d.logger.Info("RESULT FOR TASK", "ID", result.ID, "STATUS", result.Result)
 			if _, err := d.db.Exec("UPDATE tasks SET status = $1 WHERE id = $2", result.Result, result.ID); err != nil {
 				d.logger.Error("Error while updating task status.", "error", err.Error())
 			}
