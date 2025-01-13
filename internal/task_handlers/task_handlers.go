@@ -5,9 +5,9 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	"github.com/yazmeyaa/duck_wars/internal/models"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
+	"github.com/yazmeyaa/duck_wars/pkg/models"
 	"github.com/yazmeyaa/duck_wars/pkg/worker"
 )
 

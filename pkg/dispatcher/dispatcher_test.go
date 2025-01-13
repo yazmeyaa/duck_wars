@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yazmeyaa/duck_wars/internal/models"
-	"github.com/yazmeyaa/duck_wars/pkg/config"
-	"github.com/yazmeyaa/duck_wars/pkg/database"
+	"github.com/yazmeyaa/duck_wars/internal/config"
+	"github.com/yazmeyaa/duck_wars/internal/database"
 	"github.com/yazmeyaa/duck_wars/pkg/dispatcher"
+	"github.com/yazmeyaa/duck_wars/pkg/models"
 	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
 	"github.com/yazmeyaa/duck_wars/pkg/worker"
 )

@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/google/uuid"
-	"github.com/yazmeyaa/duck_wars/internal/models"
+	"github.com/yazmeyaa/duck_wars/pkg/models"
 )
 
 type TaskResult struct {

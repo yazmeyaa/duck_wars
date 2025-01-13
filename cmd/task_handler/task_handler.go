@@ -7,17 +7,17 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"github.com/yazmeyaa/duck_wars/internal/config"
+	"github.com/yazmeyaa/duck_wars/internal/database"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
 	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
 	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
 	"github.com/yazmeyaa/duck_wars/internal/task_handlers"
-	"github.com/yazmeyaa/duck_wars/pkg/config"
-	"github.com/yazmeyaa/duck_wars/pkg/database"
+	"github.com/yazmeyaa/duck_wars/internal/telegram_bot"
 	"github.com/yazmeyaa/duck_wars/pkg/dispatcher"
 	"github.com/yazmeyaa/duck_wars/pkg/logger"
-	"github.com/yazmeyaa/duck_wars/pkg/telegram_bot"
 )
 
 var (

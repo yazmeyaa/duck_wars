@@ -4,7 +4,7 @@
         "title": "Forest",
         "success_chance": 0.85,
         "description": "Go to the forest, you can find some resources there. Safe, but you may encounter creatures.",
-        "duration": 300,
+        "duration": 3,
         "energy_cost": 1,
         "start_messages": [],
         "success_messages": [

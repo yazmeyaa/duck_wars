@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/yazmeyaa/duck_wars/internal/models"
+	"github.com/yazmeyaa/duck_wars/pkg/models"
 )
 
 type SheduleTask struct {

@@ -8,6 +8,8 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/yazmeyaa/duck_wars/internal/bot/bot_updates_handler"
+	"github.com/yazmeyaa/duck_wars/internal/config"
+	"github.com/yazmeyaa/duck_wars/internal/database"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
 	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
 	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
@@ -15,10 +17,8 @@ import (
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/pkg/config"
-	"github.com/yazmeyaa/duck_wars/pkg/database"
+	"github.com/yazmeyaa/duck_wars/internal/telegram_bot"
 	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
-	"github.com/yazmeyaa/duck_wars/pkg/telegram_bot"
 )
 
 var (
