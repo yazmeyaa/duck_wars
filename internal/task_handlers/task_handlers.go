@@ -6,7 +6,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
+	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
 	"github.com/yazmeyaa/duck_wars/pkg/models"
 	"github.com/yazmeyaa/duck_wars/pkg/worker"
 )
@@ -26,7 +26,7 @@ func SuccessTask(t models.Task) worker.TaskResult {
 	}
 }
 
-func NewTaskHandlersMap(logger *slog.Logger, gd *game_data.GameData, bot *tgbotapi.BotAPI, charService *character_service.CharacterService, inventoryService *inventory_service.InventoryService) map[string]worker.TaskHandler {
+func NewTaskHandlersMap(logger *slog.Logger, gd *game_data.GameData, bot *tgbotapi.BotAPI, charService *character_service.CharacterService, inventoryService inventory_service.InventoryService) map[string]worker.TaskHandler {
 	handlers := map[string]worker.TaskHandler{
 		"finish_adventure": finishAdventureHandler(bot, logger, gd, charService, inventoryService),
 	}

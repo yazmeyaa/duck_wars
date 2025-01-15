@@ -1,8 +1,8 @@
 {
     "rope": {
         "item_id": "rope",
-        "recipes": [
-            {
+        "recipes": {
+            "rope_recipe_1": {
                 "id": "rope_recipe_1",
                 "quantity": 1,
                 "energy_cost": 1,
@@ -13,8 +13,8 @@
                     }
                 ]
             },
-            {
-                "id": "rope_recipe_1",
+            "rope_recipe_2": {
+                "id": "rope_recipe_2",
                 "quantity": 1,
                 "energy_cost": 1,
                 "items": [
@@ -24,12 +24,12 @@
                     }
                 ]
             }
-        ]
+        }
     },
     "wooden_sword": {
         "item_id": "wooden_sword",
-        "recipes": [
-            {
+        "recipes": {
+            "wooden_sword_recipe_1": {
                 "id": "wooden_sword_recipe_1",
                 "quantity": 1,
                 "energy_cost": 2,
@@ -44,6 +44,6 @@
                     }
                 ]
             }
-        ]
+        }
     }
 }

@@ -10,12 +10,12 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
+	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/pkg/bot_commands_handler"
 )
 
-func HandleInventoryCommand(gameData *game_data.GameData, userService user_service.UserService, characterService *character_service.CharacterService, inventoryService *inventory_service.InventoryService, logger *slog.Logger) bot_commands_handler.HandleBotCommand {
+func HandleInventoryCommand(gameData *game_data.GameData, userService user_service.UserService, characterService *character_service.CharacterService, inventoryService inventory_service.InventoryService, logger *slog.Logger) bot_commands_handler.HandleBotCommand {
 	return func(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		tgID := update.FromChat().ID
 

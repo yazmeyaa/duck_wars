@@ -8,7 +8,7 @@ import (
 	"github.com/yazmeyaa/duck_wars/internal/bot/bot_updates_handler/command_handlers"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
+	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/pkg/bot_commands_handler"
 	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
@@ -48,7 +48,7 @@ func New(
 	sheduler *sheduler.Sheduler,
 	userService user_service.UserService,
 	characterService *character_service.CharacterService,
-	inventoryService *inventory_service.InventoryService,
+	inventoryService inventory_service.InventoryService,
 	logger *slog.Logger,
 ) *BotUpdateHandler {
 	commandsHandler := command_handlers.NewCommandsHandler(

@@ -15,7 +15,7 @@ import (
 	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
 	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	"github.com/yazmeyaa/duck_wars/internal/service/inventory_service"
+	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/internal/telegram_bot"
 	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
