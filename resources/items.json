@@ -90,18 +90,18 @@
         "usedInCraft": true
     },
     "leather": {
-        "id": "animal_skin",
+        "id": "leather",
         "type": "item",
-        "name": "Animal skin",
+        "name": "Leather",
         "description": "Skin taken from an animal",
         "soldable": true,
         "craftable": false,
         "usedInCraft": true
     },
     "strips_of_leather": {
-        "id": "animal_skin",
+        "id": "strips_of_leather",
         "type": "item",
-        "name": "Animal skin",
+        "name": "Strips of leather",
         "description": "Skin taken from an animal",
         "soldable": true,
         "craftable": false,

@@ -15,6 +15,14 @@
                 }
             },
             {
+                "item_id": "tree_fibers",
+                "chance": 0.7,
+                "quantity": {
+                    "min": 2,
+                    "max": 7
+                }
+            },
+            {
                 "item_id": "wood_log",
                 "chance": 0.4,
                 "quantity": {

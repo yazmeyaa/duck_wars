@@ -16,6 +16,7 @@ import (
 	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
+	items_service "github.com/yazmeyaa/duck_wars/internal/service/items"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/internal/telegram_bot"
 	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
@@ -68,6 +69,7 @@ func main() {
 	userService := user_service.New(logger, userRepository, characterRepository)
 	characterService := character_service.New(characterRepository, logger)
 	inventoryService := inventory_service.New(inventoryRepository, logger)
+	itemsService := items_service.New(inventoryService, inventoryRepository, gd)
 
 	if err != nil {
 		if errors.Is(err, telegram_bot.ErrTokenNotProvided) {
@@ -84,7 +86,7 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 
-	updatesHandler := bot_updates_handler.New(gd, sheduler, userService, characterService, inventoryService, logger)
+	updatesHandler := bot_updates_handler.New(gd, sheduler, userService, characterService, inventoryService, itemsService, logger)
 
 	for update := range updates {
 		updatesHandler.HandleUpdate(bot, &update)

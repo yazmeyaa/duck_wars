@@ -9,7 +9,7 @@ import (
 
 type GameData struct {
 	Items            map[string]Item
-	Crafts           map[string]Craft
+	Crafts           map[string]CraftRecipe
 	WeaponAttributes map[string]WeaponAttribute
 	Adventures       map[string]Adventure
 	AdventureRewards map[string]AdventureRewards
@@ -25,7 +25,7 @@ type GameDataConstructor struct {
 }
 
 func (gd *GameData) Read(props GameDataConstructor) error {
-	craftData, err := readJSONFile[map[string]Craft](props.CraftFile)
+	craftData, err := readJSONFile[map[string]CraftRecipe](props.CraftFile)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (gd *GameData) Read(props GameDataConstructor) error {
 func NewGameData(logger *slog.Logger) *GameData {
 	return &GameData{
 		Items:            make(map[string]Item),
-		Crafts:           make(map[string]Craft),
+		Crafts:           make(map[string]CraftRecipe),
 		WeaponAttributes: make(map[string]WeaponAttribute),
 		Adventures:       make(map[string]Adventure),
 		logger:           logger,

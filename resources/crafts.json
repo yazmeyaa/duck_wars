@@ -1,49 +1,54 @@
 {
-    "rope": {
+    "rope_recipe_1": {
+        "id": "rope_recipe_1",
         "item_id": "rope",
-        "recipes": {
-            "rope_recipe_1": {
-                "id": "rope_recipe_1",
-                "quantity": 1,
-                "energy_cost": 1,
-                "items": [
-                    {
-                        "item_id": "tree_fiber",
-                        "quantity": 5
-                    }
-                ]
-            },
-            "rope_recipe_2": {
-                "id": "rope_recipe_2",
-                "quantity": 1,
-                "energy_cost": 1,
-                "items": [
-                    {
-                        "item_id": "strips_of_leather",
-                        "quantity": 4
-                    }
-                ]
+        "quantity": 1,
+        "energy_cost": 1,
+        "items": [
+            {
+                "item_id": "tree_fibers",
+                "quantity": 5
             }
-        }
+        ]
     },
-    "wooden_sword": {
-        "item_id": "wooden_sword",
-        "recipes": {
-            "wooden_sword_recipe_1": {
-                "id": "wooden_sword_recipe_1",
-                "quantity": 1,
-                "energy_cost": 2,
-                "items": [
-                    {
-                        "item_id": "rope",
-                        "quantity": 1
-                    },
-                    {
-                        "item_id": "wooden_beams",
-                        "quantity": 2
-                    }
-                ]
+    "rope_recipe_2": {
+        "id": "rope_recipe_2",
+        "item_id": "rope",
+        "quantity": 1,
+        "energy_cost": 1,
+        "items": [
+            {
+                "item_id": "strips_of_leather",
+                "quantity": 4
             }
-        }
+        ]
+    },
+    "wooden_beams_reciepe_1": {
+        "id": "wooden_sword_recipe_1",
+        "item_id": "wooden_beams",
+        "quantity": 1,
+        "energy_cost": 1,
+        "items": [
+            {
+                "item_id": "wood_log",
+                "quantity": 1
+            }
+        ]
+    },
+    "wooden_sword_recipe_1": {
+        "id": "wooden_sword_recipe_1",
+        "item_id": "wooden_sword",
+        "quantity": 1,
+        "energy_cost": 1,
+        "items": [
+            {
+                "item_id": "rope",
+                "quantity": 1
+            },
+            {
+                "item_id": "wooden_beams",
+                "quantity": 2
+            }
+        ]
     }
 }
