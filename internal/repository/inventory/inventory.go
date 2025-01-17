@@ -33,4 +33,5 @@ type InventoryRepository interface {
 	AddItemsBatch(ctx context.Context, characterID int, items []SingleItemDTO) error
 	RemoveItemsBatch(ctx context.Context, characterID int, itemsToDelete []SingleItemDTO) error
 	CraftItems(ctx context.Context, characterID int, itemsToRemove []SingleItemDTO, itemsToAdd []SingleItemDTO) error
+	TransferItems(ctx context.Context, fromID int, toID int, items []SingleItemDTO) error
 }

@@ -10,149 +10,76 @@ import (
 	"github.com/yazmeyaa/duck_wars/internal/models"
 )
 
-type inventoryRepositoryPostgres struct {
+type postgresRepository struct {
 	db *sql.DB
 }
 
-// GetItems implements InventoryRepository.
-func (i *inventoryRepositoryPostgres) GetItems(ctx context.Context, characterID int, itemIds []string) ([]models.InventoryItem, error) {
-	rows, err := sq.Select("character_id", "item_id", "quantity").
-		From("inventory_items").
-		Where(
-			sq.And{
-				sq.Eq{
-					"item_id":      itemIds,
-					"character_id": characterID,
-				},
-				sq.Expr("quantity > 0"),
-			},
-		).
-		PlaceholderFormat(sq.Dollar).
-		RunWith(i.db).
-		QueryContext(ctx)
-
-	if err != nil {
-		return nil, err
+func New(db *sql.DB) InventoryRepository {
+	return &postgresRepository{
+		db: db,
 	}
-
-	var items []models.InventoryItem
-
-	for rows.Next() {
-		var item models.InventoryItem
-		if err := rows.Scan(&item.CharacterID, &item.ItemID, &item.Quantity); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
 }
 
-func getItemsTx(ctx context.Context, tx *sql.Tx, characterId int, itemIds []string) ([]models.InventoryItem, error) {
-	rows, err := sq.Select("character_id", "item_id", "quantity").
-		From("inventory_items").
-		Where(
-			sq.And{
-				sq.Eq{
-					"item_id":      itemIds,
-					"character_id": characterId,
-				},
-				sq.Expr("quantity > 0"),
-			},
-		).
-		PlaceholderFormat(sq.Dollar).
-		RunWith(tx).
-		QueryContext(ctx)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var items []models.InventoryItem
-
-	for rows.Next() {
-		var item models.InventoryItem
-		if err := rows.Scan(&item.CharacterID, &item.ItemID, &item.Quantity); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
+type MissedItem struct {
+	ItemID   string
+	Quantity uint16
 }
 
-func (i *inventoryRepositoryPostgres) removeItemsTx(ctx context.Context, tx *sql.Tx, characterID int, items []SingleItemDTO) error {
-	if len(items) == 0 {
-		return nil
-	}
-
-	ids := make([]string, len(items))
-	caseStmt := sq.Case("item_id")
-
-	for idx, item := range items {
-		ids[idx] = item.ItemID
-		caseStmt = caseStmt.When(
-			sq.Expr("?", item.ItemID),
-			sq.Expr("GREATEST(quantity - ?, 0)", item.Quantity),
-		)
-	}
-	whereStmt := sq.Eq{
-		"character_id": characterID,
-	}
-	whereStmt["item_id"] = ids
-
-	query, args, err := sq.Update(dbName).
-		Set("quantity", caseStmt).
-		Where(whereStmt).
-		PlaceholderFormat(sq.Dollar).
-		ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = tx.ExecContext(ctx, query, args...)
-
-	return err
+type Queryer interface {
+	QueryContext(ctx context.Context, q string, args ...any) (*sql.Rows, error)
+	Query(q string, args ...any) (*sql.Rows, error)
 }
 
-func getItemsIds(items []SingleItemDTO) []string {
-	r := make([]string, len(items))
-	for idx, item := range items {
-		r[idx] = item.ItemID
-	}
-	return r
+type Executer interface {
+	Exec(q string, args ...any) (sql.Result, error)
+	ExecContext(ctx context.Context, q string, args ...any) (sql.Result, error)
 }
 
-func addItemsTx(ctx context.Context, tx *sql.Tx, characterID int, items []SingleItemDTO) error {
-	if len(items) == 0 {
-		return nil
-	}
-
-	stmt := sq.Insert(dbName).
-		Columns("character_id", "item_id", "quantity")
-
-	for _, item := range items {
-		stmt = stmt.Values(characterID, item.ItemID, item.Quantity)
-	}
-
-	stmt = stmt.Suffix("ON CONFLICT (item_id, character_id) DO UPDATE SET quantity = inventory_items.quantity + EXCLUDED.quantity")
-
-	stmt = stmt.PlaceholderFormat(sq.Dollar)
-	_, err := stmt.RunWith(tx).ExecContext(ctx)
-
-	return err
-}
-
-// CraftItems implements InventoryRepository.
-func (i *inventoryRepositoryPostgres) CraftItems(ctx context.Context, characterID int, itemsToRemove []SingleItemDTO, itemsToAdd []SingleItemDTO) error {
+// TransferItems implements InventoryRepository.
+func (i *postgresRepository) TransferItems(ctx context.Context, fromID int, toID int, items []SingleItemDTO) error {
 	tx, err := i.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	removeItemsIds := getItemsIds(itemsToRemove)
-	availableItems, err := getItemsTx(ctx, tx, characterID, removeItemsIds)
+	missedItems, err := i.characterHasEnoughtItems(ctx, tx, fromID, items)
+	if err != nil {
+		return err
+	}
+	if len(missedItems) > 0 {
+		return ErrNotEnoughtItems
+	}
+
+	if err := i.removeItems(ctx, tx, fromID, items); err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := i.addItems(ctx, tx, toID, items); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetItems implements InventoryRepository.
+func (i *postgresRepository) GetItems(ctx context.Context, characterID int, itemIds []string) ([]models.InventoryItem, error) {
+	return i.getItems(ctx, i.db, characterID, itemIds)
+}
+
+// CraftItems implements InventoryRepository.
+func (i *postgresRepository) CraftItems(ctx context.Context, characterID int, itemsToRemove []SingleItemDTO, itemsToAdd []SingleItemDTO) error {
+	tx, err := i.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	removeItemsIds := i.getItemsIds(itemsToRemove)
+	availableItems, err := i.getItems(ctx, tx, characterID, removeItemsIds)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -178,12 +105,12 @@ func (i *inventoryRepositoryPostgres) CraftItems(ctx context.Context, characterI
 		}
 	}
 
-	if err := i.removeItemsTx(ctx, tx, characterID, itemsToRemove); err != nil {
+	if err := i.removeItems(ctx, tx, characterID, itemsToRemove); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if err := addItemsTx(ctx, tx, characterID, itemsToAdd); err != nil {
+	if err := i.addItems(ctx, tx, characterID, itemsToAdd); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -195,7 +122,7 @@ func (i *inventoryRepositoryPostgres) CraftItems(ctx context.Context, characterI
 }
 
 // UpdateItemsBatch implements InventoryRepository.
-func (i *inventoryRepositoryPostgres) UpdateItemsBatch(ctx context.Context, characterID int, items []SingleItemDTO) error {
+func (i *postgresRepository) UpdateItemsBatch(ctx context.Context, characterID int, items []SingleItemDTO) error {
 	if len(items) == 0 {
 		return nil
 	}
@@ -221,26 +148,12 @@ func (i *inventoryRepositoryPostgres) UpdateItemsBatch(ctx context.Context, char
 }
 
 // AddItemsBatch implements InventoryRepository.
-func (i *inventoryRepositoryPostgres) AddItemsBatch(ctx context.Context, characterID int, items []SingleItemDTO) error {
-	if len(items) == 0 {
-		return nil
-	}
-
-	stmt := sq.Insert(dbName).
-		Columns("character_id", "item_id", "quantity")
-
-	for _, item := range items {
-		stmt = stmt.Values(characterID, item.ItemID, item.Quantity)
-	}
-
-	stmt = stmt.PlaceholderFormat(sq.Dollar)
-	_, err := stmt.RunWith(i.db).ExecContext(ctx)
-
-	return err
+func (i *postgresRepository) AddItemsBatch(ctx context.Context, characterID int, items []SingleItemDTO) error {
+	return i.addItems(ctx, i.db, characterID, items)
 }
 
 // RemoveItemsBatch implements InventoryRepository.
-func (i *inventoryRepositoryPostgres) RemoveItemsBatch(ctx context.Context, characterID int, itemsToDelete []SingleItemDTO) error {
+func (i *postgresRepository) RemoveItemsBatch(ctx context.Context, characterID int, itemsToDelete []SingleItemDTO) error {
 	ids := make([]string, len(itemsToDelete))
 	for _, item := range itemsToDelete {
 		ids = append(ids, item.ItemID)
@@ -255,13 +168,7 @@ func (i *inventoryRepositoryPostgres) RemoveItemsBatch(ctx context.Context, char
 	return err
 }
 
-func New(db *sql.DB) InventoryRepository {
-	return &inventoryRepositoryPostgres{
-		db: db,
-	}
-}
-
-func (i *inventoryRepositoryPostgres) AddItem(ctx context.Context, itemID string, characterID int, quantity uint16) error {
+func (i *postgresRepository) AddItem(ctx context.Context, itemID string, characterID int, quantity uint16) error {
 	if quantity == 0 {
 		return ErrZeroQuantity
 	}
@@ -277,7 +184,7 @@ func (i *inventoryRepositoryPostgres) AddItem(ctx context.Context, itemID string
 	return err
 }
 
-func (i *inventoryRepositoryPostgres) RemoveItem(ctx context.Context, itemID string, characterID int) error {
+func (i *postgresRepository) RemoveItem(ctx context.Context, itemID string, characterID int) error {
 	_, err := i.db.ExecContext(
 		ctx,
 		"DELETE FROM inventory_items WHERE item_id=$1 AND character_id=$2",
@@ -288,7 +195,7 @@ func (i *inventoryRepositoryPostgres) RemoveItem(ctx context.Context, itemID str
 	return err
 }
 
-func (r *inventoryRepositoryPostgres) UpdateQuantity(ctx context.Context, characterID int, itemID string, quantityDelta int) error {
+func (r *postgresRepository) UpdateQuantity(ctx context.Context, characterID int, itemID string, quantityDelta int) error {
 	if quantityDelta == 0 {
 		return ErrZeroQuantity
 	}
@@ -324,7 +231,7 @@ func (r *inventoryRepositoryPostgres) UpdateQuantity(ctx context.Context, charac
 	return err
 }
 
-func (i *inventoryRepositoryPostgres) GetInventory(ctx context.Context, characterID int) ([]models.InventoryItem, error) {
+func (i *postgresRepository) GetInventory(ctx context.Context, characterID int) ([]models.InventoryItem, error) {
 	rows, err := i.db.QueryContext(
 		ctx,
 		`
@@ -353,7 +260,7 @@ func (i *inventoryRepositoryPostgres) GetInventory(ctx context.Context, characte
 	return items, nil
 }
 
-func (i *inventoryRepositoryPostgres) GetItem(ctx context.Context, characterID int, itemID string) (*models.InventoryItem, error) {
+func (i *postgresRepository) GetItem(ctx context.Context, characterID int, itemID string) (*models.InventoryItem, error) {
 	row := i.db.QueryRowContext(
 		ctx,
 		`SELECT character_id, item_id, quantity
@@ -372,4 +279,137 @@ func (i *inventoryRepositoryPostgres) GetItem(ctx context.Context, characterID i
 	}
 
 	return &item, nil
+}
+
+func (i *postgresRepository) getItems(ctx context.Context, querier Queryer, characterId int, itemIds []string) ([]models.InventoryItem, error) {
+	stmt := sq.Select("character_id", "item_id", "quantity").
+		From("inventory_items").
+		Where(
+			sq.And{
+				sq.Eq{
+					"item_id":      itemIds,
+					"character_id": characterId,
+				},
+				sq.Expr("quantity > 0"),
+			},
+		).
+		PlaceholderFormat(sq.Dollar)
+
+	q, args, err := stmt.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := querier.QueryContext(ctx, q, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []models.InventoryItem
+
+	for rows.Next() {
+		var item models.InventoryItem
+		if err := rows.Scan(&item.CharacterID, &item.ItemID, &item.Quantity); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
+}
+
+func (i *postgresRepository) removeItems(ctx context.Context, exec Executer, characterID int, items []SingleItemDTO) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	ids := make([]string, len(items))
+	caseStmt := sq.Case("item_id")
+
+	for idx, item := range items {
+		ids[idx] = item.ItemID
+		caseStmt = caseStmt.When(
+			sq.Expr("?", item.ItemID),
+			sq.Expr("GREATEST(quantity - ?, 0)", item.Quantity),
+		)
+	}
+	whereStmt := sq.Eq{
+		"character_id": characterID,
+		"item_id":      ids,
+	}
+
+	query, args, err := sq.Update(dbName).
+		Set("quantity", caseStmt).
+		Where(whereStmt).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = exec.ExecContext(ctx, query, args...)
+
+	return err
+}
+
+func (i *postgresRepository) getItemsIds(items []SingleItemDTO) []string {
+	r := make([]string, len(items))
+	for idx, item := range items {
+		r[idx] = item.ItemID
+	}
+	return r
+}
+
+func (i *postgresRepository) addItems(ctx context.Context, exec Executer, characterID int, items []SingleItemDTO) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	stmt := sq.Insert(dbName).
+		Columns("character_id", "item_id", "quantity")
+
+	for _, item := range items {
+		stmt = stmt.Values(characterID, item.ItemID, item.Quantity)
+	}
+
+	stmt = stmt.Suffix("ON CONFLICT (item_id, character_id) DO UPDATE SET quantity = inventory_items.quantity + EXCLUDED.quantity")
+
+	stmt = stmt.PlaceholderFormat(sq.Dollar)
+	q, args, err := stmt.ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = exec.ExecContext(ctx, q, args...)
+
+	return err
+}
+
+func (i *postgresRepository) characterHasEnoughtItems(ctx context.Context, q Queryer, characterID int, requiredItems []SingleItemDTO) ([]MissedItem, error) {
+	ids := i.getItemsIds(requiredItems)
+	availableItems, err := i.getItems(ctx, q, characterID, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var missedItems []MissedItem
+
+	for _, requiredItem := range requiredItems {
+		isAvailable := false
+		for _, item := range availableItems {
+			if item.Quantity == requiredItem.Quantity && item.Quantity >= requiredItem.Quantity {
+				isAvailable = true
+				break
+			}
+		}
+
+		if !isAvailable {
+			missedItems = append(missedItems, MissedItem{
+				ItemID: requiredItem.ItemID,
+			})
+		}
+	}
+
+	return missedItems, nil
 }

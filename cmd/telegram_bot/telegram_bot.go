@@ -64,7 +64,7 @@ func main() {
 	}
 
 	userRepository := user_repository.New(db)
-	characterRepository := character_repository.New(db)
+	characterRepository := character_repository.NewPostgres(db)
 	inventoryRepository := inventory_repository.New(db)
 	userService := user_service.New(logger, userRepository, characterRepository)
 	characterService := character_service.New(characterRepository, logger)

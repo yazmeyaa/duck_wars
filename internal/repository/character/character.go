@@ -14,17 +14,24 @@ const (
 	dbName = "characters"
 )
 
-type CharacterRepository struct {
+type CharacterRepository interface {
+	Create(ctx context.Context, data CreateCharacterDTO) (id int, err error)
+	GetByUserID(ctx context.Context, id int) (*models.Character, error)
+	GetByID(ctx context.Context, id int) (*models.Character, error)
+	Update(ctx context.Context, id int, data UpdateCharacterDTO) error
+}
+
+type postgresRepository struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) *CharacterRepository {
-	return &CharacterRepository{
+func NewPostgres(db *sql.DB) CharacterRepository {
+	return &postgresRepository{
 		db: db,
 	}
 }
 
-func (cr *CharacterRepository) Create(ctx context.Context, data CreateCharacterDTO) (id int, err error) {
+func (cr *postgresRepository) Create(ctx context.Context, data CreateCharacterDTO) (id int, err error) {
 	row := sq.Insert(dbName).Columns(
 		"user_id",
 		"name",
@@ -45,7 +52,7 @@ func (cr *CharacterRepository) Create(ctx context.Context, data CreateCharacterD
 	return id, nil
 }
 
-func (cr *CharacterRepository) GetByUserID(ctx context.Context, id int) (*models.Character, error) {
+func (cr *postgresRepository) GetByUserID(ctx context.Context, id int) (*models.Character, error) {
 	row := sq.Select(
 		"id",
 		"user_id",
@@ -80,7 +87,7 @@ func (cr *CharacterRepository) GetByUserID(ctx context.Context, id int) (*models
 	return &char, nil
 }
 
-func (cr *CharacterRepository) GetByID(ctx context.Context, id int) (*models.Character, error) {
+func (cr *postgresRepository) GetByID(ctx context.Context, id int) (*models.Character, error) {
 	row := sq.Select("id",
 		"user_id",
 		"name",
@@ -114,7 +121,7 @@ func (cr *CharacterRepository) GetByID(ctx context.Context, id int) (*models.Cha
 	return &char, nil
 }
 
-func (c *CharacterRepository) Update(ctx context.Context, id int, data UpdateCharacterDTO) error {
+func (c *postgresRepository) Update(ctx context.Context, id int, data UpdateCharacterDTO) error {
 	expr := sq.Update(dbName)
 
 	if data.Coins.Valid {

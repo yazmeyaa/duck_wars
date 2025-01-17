@@ -19,7 +19,7 @@ type UserService interface {
 type userService struct {
 	logger              *slog.Logger
 	userRepository      user_repository.UserRepository
-	characterRepository *character_repository.CharacterRepository
+	characterRepository character_repository.CharacterRepository
 }
 
 // Create implements UserService.
@@ -77,7 +77,7 @@ func (u *userService) GetByTelegramID(ctx context.Context, id int64) (*models.Us
 	return user, nil
 }
 
-func New(logger *slog.Logger, userRepository user_repository.UserRepository, characterRepository *character_repository.CharacterRepository) UserService {
+func New(logger *slog.Logger, userRepository user_repository.UserRepository, characterRepository character_repository.CharacterRepository) UserService {
 	return &userService{
 		logger:              logger,
 		userRepository:      userRepository,

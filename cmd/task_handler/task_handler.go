@@ -57,7 +57,7 @@ func main() {
 		return
 	}
 
-	charRepo := character_repository.New(db)
+	charRepo := character_repository.NewPostgres(db)
 	charService := character_service.New(charRepo, logger)
 	inventoryRepo := inventory_repository.New(db)
 	inventoryService := inventory_service.New(inventoryRepo, logger)

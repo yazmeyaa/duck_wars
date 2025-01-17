@@ -13,11 +13,11 @@ import (
 )
 
 type CharacterService struct {
-	characterRepository *character_repository.CharacterRepository
+	characterRepository character_repository.CharacterRepository
 	logger              *slog.Logger
 }
 
-func New(characterRepo *character_repository.CharacterRepository, logger *slog.Logger) *CharacterService {
+func New(characterRepo character_repository.CharacterRepository, logger *slog.Logger) *CharacterService {
 	return &CharacterService{
 		characterRepository: characterRepo,
 		logger:              logger,

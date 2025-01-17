@@ -25,12 +25,12 @@ type UserRepository interface {
 	GetByTelegramID(ctx context.Context, id int64) (*models.User, error)
 }
 
-type userRepository struct {
+type postgresRepository struct {
 	db *sql.DB
 }
 
 // GetByTelegramID implements UserRepository.
-func (u *userRepository) GetByTelegramID(ctx context.Context, id int64) (*models.User, error) {
+func (u *postgresRepository) GetByTelegramID(ctx context.Context, id int64) (*models.User, error) {
 	row := sq.Select(
 		"id",
 		"telegram_id",
@@ -61,7 +61,7 @@ func (u *userRepository) GetByTelegramID(ctx context.Context, id int64) (*models
 }
 
 // Create implements UserRepository.
-func (u *userRepository) Create(ctx context.Context, data CreateUserDTO) (int, error) {
+func (u *postgresRepository) Create(ctx context.Context, data CreateUserDTO) (int, error) {
 	row := sq.Insert(dbName).
 		Columns("telegram_id").
 		Values(data.TelegramID).
@@ -89,7 +89,7 @@ func (u *userRepository) Create(ctx context.Context, data CreateUserDTO) (int, e
 }
 
 // Delete implements UserRepository.
-func (u *userRepository) Delete(ctx context.Context, id int) error {
+func (u *postgresRepository) Delete(ctx context.Context, id int) error {
 	_, err := sq.Delete(dbName).
 		Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar).
@@ -100,7 +100,7 @@ func (u *userRepository) Delete(ctx context.Context, id int) error {
 }
 
 // GetByID implements UserRepository.
-func (u *userRepository) GetByID(ctx context.Context, id int) (*models.User, error) {
+func (u *postgresRepository) GetByID(ctx context.Context, id int) (*models.User, error) {
 	row := sq.Select(
 		"id",
 		"telegram_id",
@@ -131,7 +131,7 @@ func (u *userRepository) GetByID(ctx context.Context, id int) (*models.User, err
 }
 
 func New(db *sql.DB) UserRepository {
-	return &userRepository{
+	return &postgresRepository{
 		db: db,
 	}
 }
