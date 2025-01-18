@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -29,9 +27,7 @@ func (d *DatabaseConfig) DSN() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", d.Username, d.Password, d.Host, d.Port, d.Database)
 }
 
-func New(filepath ...string) *Config {
-	godotenv.Load(filepath...)
-
+func New() *Config {
 	return &Config{
 		TelegramBot: TelegramBot{
 			Token: getEnv("TELEGRAM_BOT_TOKEN", ""),
@@ -39,9 +35,9 @@ func New(filepath ...string) *Config {
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnvAsInt("DB_PORT", 5432),
-			Username: getEnv("DB_USERNAME", "postgres"),
+			Username: getEnv("DB_USER", "postgres"),
 			Password: getEnv("DB_PASSWORD", "admin"),
-			Database: getEnv("DB_DATABASE", "duckwars"),
+			Database: getEnv("DB_NAME", "duckwars"),
 		},
 	}
 }

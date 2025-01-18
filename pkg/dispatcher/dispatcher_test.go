@@ -28,7 +28,7 @@ func TestDispatcher(t *testing.T) {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	cfg := config.New("../../.env")
+	cfg := config.New()
 	db, err := database.New(cfg)
 	if err != nil {
 		logger.Error(err.Error())
