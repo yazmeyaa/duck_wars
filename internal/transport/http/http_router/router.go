@@ -1,23 +1,30 @@
 package http_router
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/yazmeyaa/duck_wars/internal/transport/http/http_controllers"
+	"github.com/yazmeyaa/duck_wars/internal/transport/http/middlewares"
+	"github.com/yazmeyaa/duck_wars/internal/transport/http/middlewares/logger_middleware"
+	"github.com/yazmeyaa/duck_wars/internal/transport/http/middlewares/panic_recover_middleware"
 )
 
 type RouterConstructor struct {
 	CharacterController http_controllers.CharacterController
+	Logger              *slog.Logger
 }
 
 func New(c RouterConstructor) http.Handler {
-	root := http.NewServeMux()
-
+	characterRouter := newCharactersHandler(c.CharacterController)
 	v1 := http.NewServeMux()
-	root.Handle("/v1", v1)
+	v1.Handle("/character/", http.StripPrefix("/character", characterRouter))
 
-	characterRouter := setupCharacterRouter(c.CharacterController)
-	v1.Handle("/character", http.StripPrefix("/character", characterRouter))
-
-	return root
+	root := http.NewServeMux()
+	root.Handle("/v1/", http.StripPrefix("/v1", v1))
+	return middlewares.ApplyMiddleware(
+		root,
+		logger_middleware.LoggerMiddleware(c.Logger),
+		panic_recover_middleware.PanicRecoveryMiddleware(c.Logger),
+	)
 }

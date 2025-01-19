@@ -28,9 +28,10 @@ func main() {
 	characterController := http_controllers.NewCharacterController(userService, *characterService)
 	router := http_router.New(http_router.RouterConstructor{
 		CharacterController: characterController,
+		Logger:              logger,
 	})
 
-	if err := http.ListenAndServe(":8080", router); err != nil {
+	if err := http.ListenAndServe(":8000", router); err != nil {
 		panic(err)
 	}
 
