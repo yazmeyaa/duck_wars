@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
 	"github.com/yazmeyaa/duck_wars/internal/transport/http/http_controllers"
 	"github.com/yazmeyaa/duck_wars/internal/transport/http/middlewares"
 	"github.com/yazmeyaa/duck_wars/internal/transport/http/middlewares/logger_middleware"
@@ -11,12 +12,13 @@ import (
 )
 
 type RouterConstructor struct {
-	CharacterController http_controllers.CharacterController
-	Logger              *slog.Logger
+	CharacterController  http_controllers.CharacterController
+	Logger               *slog.Logger
+	AuthorizationService authorization_service.AuthorizationService
 }
 
 func New(c RouterConstructor) http.Handler {
-	characterRouter := newCharactersHandler(c.CharacterController)
+	characterRouter := newCharactersHandler(c.CharacterController, c.AuthorizationService, c.Logger)
 	v1 := http.NewServeMux()
 	v1.Handle("/character/", http.StripPrefix("/character", characterRouter))
 
