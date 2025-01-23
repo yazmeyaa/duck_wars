@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/yazmeyaa/duck_wars/internal/transport/http/middlewares"
+	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares"
 )
 
 func PanicRecoveryMiddleware(logger *slog.Logger) middlewares.Middleware {
@@ -14,6 +14,7 @@ func PanicRecoveryMiddleware(logger *slog.Logger) middlewares.Middleware {
 			defer func() {
 				err := recover()
 				if err != nil {
+					logger.Error("Panic recovered!", slog.Any("error", err))
 					jsonBody, _ := json.Marshal(map[string]string{
 						"error": "There was an internal server error",
 					})

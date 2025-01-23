@@ -9,10 +9,15 @@ import (
 type Config struct {
 	TelegramBot TelegramBot
 	Database    DatabaseConfig
+	JWT         JWTConfig
 }
 
 type TelegramBot struct {
 	Token string
+}
+
+type JWTConfig struct {
+	Secret string
 }
 
 type DatabaseConfig struct {
@@ -38,6 +43,9 @@ func New() *Config {
 			Username: getEnv("DB_USER", "postgres"),
 			Password: getEnv("DB_PASSWORD", "admin"),
 			Database: getEnv("DB_NAME", "duckwars"),
+		},
+		JWT: JWTConfig{
+			Secret: getEnv("JWT_SECRET", "FILL_SECRET_KEY"),
 		},
 	}
 }

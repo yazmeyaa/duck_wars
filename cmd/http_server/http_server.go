@@ -10,8 +10,8 @@ import (
 	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/internal/transport/http/http_controllers"
-	"github.com/yazmeyaa/duck_wars/internal/transport/http/http_router"
+	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/http_controllers"
+	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/http_router"
 	"github.com/yazmeyaa/duck_wars/pkg/logger"
 )
 
@@ -28,10 +28,12 @@ func main() {
 	characterService := character_service.New(characterRepository, logger)
 	characterController := http_controllers.NewCharacterController(userService, *characterService)
 	authorizationService := authorization_service.New(cfg)
+	authController := http_controllers.NewAuthenticationController(authorizationService, userService, logger)
 	router := http_router.New(http_router.RouterConstructor{
-		CharacterController:  characterController,
-		Logger:               logger,
-		AuthorizationService: authorizationService,
+		CharacterController:      characterController,
+		AuthenticationController: authController,
+		Logger:                   logger,
+		AuthorizationService:     authorizationService,
 	})
 
 	if err := http.ListenAndServe(":8000", router); err != nil {
