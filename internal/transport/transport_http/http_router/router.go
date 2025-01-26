@@ -7,6 +7,7 @@ import (
 	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
 	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/http_controllers"
 	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares"
+	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares/cors_middleware"
 	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares/logger_middleware"
 	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares/panic_recover_middleware"
 )
@@ -21,7 +22,7 @@ type RouterConstructor struct {
 func New(c RouterConstructor) http.Handler {
 	characterRouter := newCharactersHandler(c.CharacterController, c.AuthorizationService, c.Logger)
 	v1 := http.NewServeMux()
-	v1.Handle("/character/", http.StripPrefix("/character", characterRouter))
+	v1.Handle("/characters/", http.StripPrefix("/characters", characterRouter))
 
 	authRouter := setupAuthRouter(c.AuthenticationController)
 	v1.Handle("/auth/", http.StripPrefix("/auth", authRouter))
@@ -31,6 +32,7 @@ func New(c RouterConstructor) http.Handler {
 	return middlewares.ApplyMiddleware(
 		root,
 		logger_middleware.LoggerMiddleware(c.Logger),
+		cors_middleware.CorsMiddleware(),
 		panic_recover_middleware.PanicRecoveryMiddleware(c.Logger),
 	)
 }

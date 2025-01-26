@@ -2,6 +2,7 @@ package http_controllers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	initdata "github.com/telegram-mini-apps/init-data-golang"
+	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
 	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
 	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http"
@@ -52,20 +54,34 @@ func (a *authenticationController) LoginViaTelegramInitData(w http.ResponseWrite
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	user, err := a.userSvc.GetByTelegramID(ctx, data.User.ID)
-	if err != nil {
-		a.logger.Error("Error while retrieve user", "fn", fn, "error", err.Error())
-		transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error")
+	var userID int
+	if errors.Is(err, user_repository.ErrUserNotFound) {
+		newUserID, err := a.userSvc.Create(ctx, user_service.CreateUserDTO{
+			TelegramID: data.User.ID,
+		})
+		if err != nil {
+			transport_http.WriteError(w, http.StatusInternalServerError, "Cannot create user.")
+			return
+		}
+		userID = newUserID
+	} else if err != nil {
+		transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get or create user...")
 		return
 	}
+	if userID == 0 {
+		userID = user.ID
+	}
 
-	token, err := a.authSvc.GenerateToken(user.ID)
+	token, err := a.authSvc.GenerateToken(userID)
 	if err != nil {
 		a.logger.Error("Error while generate JWT", "fn", fn, "error", err.Error())
 		transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error")
 		return
 	}
 
-	w.Header().Set("X-Token", token)
+	json.NewEncoder(w).Encode(map[string]string{
+		"token": token,
+	})
 	w.WriteHeader(http.StatusNoContent)
 }
 
