@@ -27,6 +27,22 @@ type authenticationController struct {
 	logger  *slog.Logger
 }
 
+func (a *authenticationController) writeToken(w http.ResponseWriter, userID int) {
+	token, err := a.authSvc.GenerateToken(userID)
+	if err != nil {
+		transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error. Cannot generate token.")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(struct {
+		Token string `json:"token"`
+	}{
+		Token: token,
+	})
+}
+
 // LoginViaTelegramInitData implements AuthenticationController.
 func (a *authenticationController) LoginViaTelegramInitData(w http.ResponseWriter, r *http.Request) {
 	const fn string = "AuthenticationController.LoginViaTelegramInitData"
@@ -54,6 +70,7 @@ func (a *authenticationController) LoginViaTelegramInitData(w http.ResponseWrite
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	user, err := a.userSvc.GetByTelegramID(ctx, data.User.ID)
+
 	var userID int
 	if errors.Is(err, user_repository.ErrUserNotFound) {
 		newUserID, err := a.userSvc.Create(ctx, user_service.CreateUserDTO{
@@ -64,25 +81,15 @@ func (a *authenticationController) LoginViaTelegramInitData(w http.ResponseWrite
 			return
 		}
 		userID = newUserID
+		a.writeToken(w, newUserID)
+		return
 	} else if err != nil {
 		transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get or create user...")
 		return
 	}
-	if userID == 0 {
-		userID = user.ID
-	}
+	userID = user.ID
 
-	token, err := a.authSvc.GenerateToken(userID)
-	if err != nil {
-		a.logger.Error("Error while generate JWT", "fn", fn, "error", err.Error())
-		transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error")
-		return
-	}
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": token,
-	})
-	w.WriteHeader(http.StatusNoContent)
+	a.writeToken(w, userID)
 }
 
 func (a *authenticationController) processValidationError(w http.ResponseWriter, err error, logger *slog.Logger) {

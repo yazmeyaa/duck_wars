@@ -37,6 +37,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      cache:
+        condition: service_healthy
       migrations:
         condition: service_completed_successfully
 
@@ -57,6 +59,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      cache:
+        condition: service_healthy
       migrations:
         condition: service_completed_successfully
 
@@ -76,6 +80,8 @@ services:
       dockerfile: cmd/telegram_bot/Dockerfile
     depends_on:
       db:
+        condition: service_healthy
+      cache:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
@@ -101,9 +107,32 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
+  cache:
+    image: redis:latest
+    container_name: redis_container
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=${REDIS_DATABASE}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      - app
+    ports:
+      - '6379:6379'
+    volumes: 
+      - cache:/data
 
 volumes:
   db_data:
+    driver: local
+  cache:
     driver: local
 
 networks:

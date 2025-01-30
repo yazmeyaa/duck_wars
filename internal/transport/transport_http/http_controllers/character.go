@@ -7,8 +7,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/yazmeyaa/duck_wars/internal/models"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
 	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
+	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http"
+	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares/auth_middleware"
 )
 
 type getCharacterResponse struct {
@@ -30,11 +33,34 @@ type characterController struct {
 	characterService character_service.CharacterService
 }
 
-// Get implements CharacterController.
-func (c *characterController) Get(w http.ResponseWriter, r *http.Request) {
+func writeUserCharacter(w http.ResponseWriter, char *models.Character) {
+	response := getCharacterResponse{
+		ID:         char.ID,
+		UserID:     char.UserID,
+		Name:       char.Name,
+		MaxEnergy:  char.MaxEnergy,
+		Coins:      char.Coins,
+		Experience: char.Experience,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("{\"message\":\"Hello world!\"}"))
+	if err := json.NewEncoder(w).Encode(&response); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+// Get implements CharacterController.
+func (c *characterController) Get(w http.ResponseWriter, r *http.Request) {
+	userID := auth_middleware.GetUserIDFromRequest(r)
+	char, err := c.characterService.GetByUserID(userID)
+	if err != nil {
+		transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get user character.")
+		return
+	}
+
+	writeUserCharacter(w, char)
 }
 
 // GetByID implements CharacterController.
@@ -54,22 +80,8 @@ func (c *characterController) GetByID(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	response := getCharacterResponse{
-		ID:         char.ID,
-		UserID:     char.UserID,
-		Name:       char.Name,
-		MaxEnergy:  char.MaxEnergy,
-		Coins:      char.Coins,
-		Experience: char.Experience,
-	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(&response); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
+	writeUserCharacter(w, char)
 }
 
 func NewCharacterController(userService user_service.UserService, characterService character_service.CharacterService) CharacterController {
