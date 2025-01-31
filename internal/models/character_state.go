@@ -12,7 +12,7 @@ const (
 
 // Any fast-updating non-important data store here
 type CharacterState struct {
-	Energy        uint8
-	SpendEnergyAt time.Time
-	State         State
+	Energy        uint8     `redis:"energy"`
+	SpendEnergyAt time.Time `redis:"spend_energy_at"`
+	State         State     `redis:"state"`
 }

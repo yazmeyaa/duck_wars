@@ -27,6 +27,8 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
     networks:
       - app
     build:
@@ -51,6 +53,8 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
     networks:
       - app
     build:
@@ -73,6 +77,8 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
     networks:
       - app
     build:

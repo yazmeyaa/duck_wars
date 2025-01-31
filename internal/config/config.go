@@ -10,6 +10,7 @@ type Config struct {
 	TelegramBot TelegramBot
 	Database    DatabaseConfig
 	JWT         JWTConfig
+	Redis       RedisConfig
 }
 
 type TelegramBot struct {
@@ -18,6 +19,14 @@ type TelegramBot struct {
 
 type JWTConfig struct {
 	Secret string
+}
+
+type RedisConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DB       int
 }
 
 type DatabaseConfig struct {
@@ -46,6 +55,13 @@ func New() *Config {
 		},
 		JWT: JWTConfig{
 			Secret: getEnv("JWT_SECRET", "FILL_SECRET_KEY"),
+		},
+		Redis: RedisConfig{
+			Host:     getEnv("REDIS_HOST", "localhost"),
+			Port:     getEnv("REDIS_PORT", "6379"),
+			Username: getEnv("REDIS_USERNAME", ""),
+			Password: getEnv("REDIS_PASSWORD", ""),
+			DB:       getEnvAsInt("REDIS_DATABASE", 0),
 		},
 	}
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/yazmeyaa/duck_wars/internal/config"
 	"github.com/yazmeyaa/duck_wars/internal/database"
+	"github.com/yazmeyaa/duck_wars/internal/redis"
 	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
 	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
 	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
@@ -16,9 +17,13 @@ import (
 )
 
 func main() {
+	logger := logger.New()
 	cfg := config.New()
 	db, err := database.New(cfg)
-	logger := logger.New()
+	if err != nil {
+		panic(err)
+	}
+	_, err = redis.NewRedisClient(cfg)
 	if err != nil {
 		panic(err)
 	}
