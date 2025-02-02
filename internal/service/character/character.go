@@ -12,31 +12,56 @@ import (
 	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
 )
 
-type CharacterService struct {
+type characterService struct {
 	characterRepository character_repository.CharacterRepository
 	logger              *slog.Logger
 }
 
-func New(characterRepo character_repository.CharacterRepository, logger *slog.Logger) *CharacterService {
-	return &CharacterService{
+// GetCharacterState implements CharacterService.
+func (c *characterService) GetCharacterState(ctx context.Context, characterID int) (*models.CharacterState, error) {
+	panic("unimplemented")
+}
+
+// GetCurrentEnergy implements CharacterService.
+func (c *characterService) GetCurrentEnergy(ctx context.Context, characterID int) (uint8, error) {
+	panic("unimplemented")
+}
+
+// SpendCharacterEnergy implements CharacterService.
+func (c *characterService) SpendCharacterEnergy(ctx context.Context, characterID int, energy uint8) error {
+	panic("unimplemented")
+}
+
+type CharacterService interface {
+	GetByID(id int) (*models.Character, error)
+	GetByUserID(id int) (*models.Character, error)
+	AddExperience(id int, xp float64) error
+	CharacterTextDecsription(char *models.Character) string
+	GetCharacterState(ctx context.Context, characterID int) (*models.CharacterState, error)
+	SpendCharacterEnergy(ctx context.Context, characterID int, energy uint8) error
+	GetCurrentEnergy(ctx context.Context, characterID int) (uint8, error)
+}
+
+func New(characterRepo character_repository.CharacterRepository, logger *slog.Logger) CharacterService {
+	return &characterService{
 		characterRepository: characterRepo,
 		logger:              logger,
 	}
 }
 
-func (c *CharacterService) GetByID(id int) (*models.Character, error) {
+func (c *characterService) GetByID(id int) (*models.Character, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
 	return c.characterRepository.GetByID(ctx, id)
 }
 
-func (c *CharacterService) GetByUserID(id int) (*models.Character, error) {
+func (c *characterService) GetByUserID(id int) (*models.Character, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
 	return c.characterRepository.GetByUserID(ctx, id)
 }
 
-func (c *CharacterService) AddExperience(id int, xp float64) error {
+func (c *characterService) AddExperience(id int, xp float64) error {
 	char, err := c.GetByID(id)
 	if err != nil {
 		c.logger.Error("Error while get user by id", "error", err.Error())
@@ -59,7 +84,7 @@ func (c *CharacterService) AddExperience(id int, xp float64) error {
 	return err
 }
 
-func (c *CharacterService) CharacterTextDecsription(char *models.Character) string {
+func (c *characterService) CharacterTextDecsription(char *models.Character) string {
 	var sb strings.Builder
 
 	sb.WriteString("Name: ")

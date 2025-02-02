@@ -8,6 +8,10 @@ import (
 	"net/http"
 )
 
+func WriteInternalError(w http.ResponseWriter) error {
+	return WriteError(w, http.StatusInternalServerError, "Internal server error.")
+}
+
 // Write an HTTP error wtith provided status code and message in JSON
 // {"error": errorMsg}
 func WriteError(w http.ResponseWriter, code int, errorMsg string) error {

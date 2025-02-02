@@ -11,7 +11,7 @@ import (
 	"github.com/yazmeyaa/duck_wars/pkg/bot_commands_handler"
 )
 
-func HandleStartCommand(userService user_service.UserService, characterService *character_service.CharacterService, logger *slog.Logger) bot_commands_handler.HandleBotCommand {
+func HandleStartCommand(userService user_service.UserService, characterService character_service.CharacterService, logger *slog.Logger) bot_commands_handler.HandleBotCommand {
 	return func(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 		defer cancel()

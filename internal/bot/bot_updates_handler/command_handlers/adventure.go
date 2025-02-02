@@ -35,7 +35,7 @@ func extractAdventureID(argsStr string) string {
 	return adventure
 }
 
-func HandleAdventureCommand(sheduler *sheduler.Sheduler, gd *game_data.GameData, userService user_service.UserService, characterService *character_service.CharacterService) bot_commands_handler.HandleBotCommand {
+func HandleAdventureCommand(sheduler *sheduler.Sheduler, gd *game_data.GameData, userService user_service.UserService, characterService character_service.CharacterService) bot_commands_handler.HandleBotCommand {
 	return func(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()

@@ -21,12 +21,7 @@ import (
 )
 
 var (
-	testDataPath              = filepath.Join("resources")
-	craftFilePath             = filepath.Join(testDataPath, "crafts.json")
-	itemsFilePath             = filepath.Join(testDataPath, "items.json")
-	weaponAttributesFilePath  = filepath.Join(testDataPath, "weapon_attributes.json")
-	adventuresFilePath        = filepath.Join(testDataPath, "adventures.json")
-	adventuresRewardsFilePath = filepath.Join(testDataPath, "adventures_rewards.json")
+	resoucesFilePath = filepath.Join("resources")
 )
 
 func main() {
@@ -39,13 +34,7 @@ func main() {
 		return
 	}
 	gd := game_data.NewGameData(logger)
-	if err := gd.Read(game_data.GameDataConstructor{
-		CraftFile:            craftFilePath,
-		ItemsFile:            itemsFilePath,
-		WeaponAttributesFile: weaponAttributesFilePath,
-		AdventuresFile:       adventuresFilePath,
-		AdventureRewardsFile: adventuresRewardsFilePath,
-	}); err != nil {
+	if err := gd.ReadFolderDefaultFiles(resoucesFilePath); err != nil {
 		logger.Error("Error while reading game data files.", "error", err.Error())
 		os.Exit(1)
 		return

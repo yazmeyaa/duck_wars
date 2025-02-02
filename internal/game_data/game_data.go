@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 )
 
 type GameData struct {
@@ -22,6 +23,16 @@ type GameDataConstructor struct {
 	WeaponAttributesFile string
 	AdventuresFile       string
 	AdventureRewardsFile string
+}
+
+func (gd *GameData) ReadFolderDefaultFiles(folderPath string) error {
+	return gd.Read(GameDataConstructor{
+		CraftFile:            filepath.Join(folderPath, "crafts.json"),
+		ItemsFile:            filepath.Join(folderPath, "items.json"),
+		WeaponAttributesFile: filepath.Join(folderPath, "weapon_attributes.json"),
+		AdventuresFile:       filepath.Join(folderPath, "adventures.json"),
+		AdventureRewardsFile: filepath.Join(folderPath, "adventures_rewards.json"),
+	})
 }
 
 func (gd *GameData) Read(props GameDataConstructor) error {

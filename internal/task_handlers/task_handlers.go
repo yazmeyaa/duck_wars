@@ -26,7 +26,7 @@ func SuccessTask(t models.Task) worker.TaskResult {
 	}
 }
 
-func NewTaskHandlersMap(logger *slog.Logger, gd *game_data.GameData, bot *tgbotapi.BotAPI, charService *character_service.CharacterService, inventoryService inventory_service.InventoryService) map[string]worker.TaskHandler {
+func NewTaskHandlersMap(logger *slog.Logger, gd *game_data.GameData, bot *tgbotapi.BotAPI, charService character_service.CharacterService, inventoryService inventory_service.InventoryService) map[string]worker.TaskHandler {
 	handlers := map[string]worker.TaskHandler{
 		"finish_adventure": finishAdventureHandler(bot, logger, gd, charService, inventoryService),
 	}

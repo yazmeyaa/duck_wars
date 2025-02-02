@@ -48,7 +48,7 @@ func New(
 	gd *game_data.GameData,
 	sheduler *sheduler.Sheduler,
 	userService user_service.UserService,
-	characterService *character_service.CharacterService,
+	characterService character_service.CharacterService,
 	inventoryService inventory_service.InventoryService,
 	itemsService items_service.ItemsService,
 	logger *slog.Logger,

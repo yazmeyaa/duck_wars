@@ -11,6 +11,7 @@ import (
 	"github.com/yazmeyaa/duck_wars/internal/config"
 	"github.com/yazmeyaa/duck_wars/internal/database"
 	"github.com/yazmeyaa/duck_wars/internal/game_data"
+	"github.com/yazmeyaa/duck_wars/internal/redis"
 	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
 	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
 	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
@@ -27,12 +28,7 @@ var (
 )
 
 var (
-	testDataPath              = filepath.Join("resources")
-	craftFilePath             = filepath.Join(testDataPath, "crafts.json")
-	itemsFilePath             = filepath.Join(testDataPath, "items.json")
-	weaponAttributesFilePath  = filepath.Join(testDataPath, "weapon_attributes.json")
-	adventuresFilePath        = filepath.Join(testDataPath, "adventures.json")
-	adventuresRewardsFilePath = filepath.Join(testDataPath, "adventures_rewards.json")
+	resourcesPath = filepath.Join("resources")
 )
 
 func main() {
@@ -45,33 +41,6 @@ func main() {
 	}
 	bot, err := telegram_bot.New(cfg)
 	if err != nil {
-		logger.Error("Error while getting telegram bot instance", "error", err.Error())
-		os.Exit(1)
-	}
-	sheduler := sheduler.NewSheduler(db, logger)
-
-	gd := game_data.NewGameData(logger)
-	if err := gd.Read(game_data.GameDataConstructor{
-		CraftFile:            craftFilePath,
-		ItemsFile:            itemsFilePath,
-		WeaponAttributesFile: weaponAttributesFilePath,
-		AdventuresFile:       adventuresFilePath,
-		AdventureRewardsFile: adventuresRewardsFilePath,
-	}); err != nil {
-		logger.Error("Error while reading game data files.", "error", err.Error())
-		os.Exit(1)
-		return
-	}
-
-	userRepository := user_repository.New(db)
-	characterRepository := character_repository.NewPostgres(db)
-	inventoryRepository := inventory_repository.New(db)
-	userService := user_service.New(logger, userRepository, characterRepository)
-	characterService := character_service.New(characterRepository, logger)
-	inventoryService := inventory_service.New(inventoryRepository, logger)
-	itemsService := items_service.New(inventoryService, inventoryRepository, gd)
-
-	if err != nil {
 		if errors.Is(err, telegram_bot.ErrTokenNotProvided) {
 			logger.Error(err.Error())
 		} else {
@@ -80,6 +49,29 @@ func main() {
 		os.Exit(1)
 		return
 	}
+	sheduler := sheduler.NewSheduler(db, logger)
+
+	rdb, err := redis.NewRedisClient(cfg)
+	if err != nil {
+		logger.Error("Error while create redis client instance.", "error", err.Error())
+		os.Exit(1)
+		return
+	}
+
+	gd := game_data.NewGameData(logger)
+	if err := gd.ReadFolderDefaultFiles(resourcesPath); err != nil {
+		logger.Error("Error while reading game data files.", "error", err.Error())
+		os.Exit(1)
+		return
+	}
+
+	userRepository := user_repository.New(db, rdb, gd)
+	characterRepository := character_repository.NewPostgres(db)
+	inventoryRepository := inventory_repository.New(db)
+	userService := user_service.New(logger, userRepository, characterRepository)
+	characterService := character_service.New(characterRepository, logger)
+	inventoryService := inventory_service.New(inventoryRepository, logger)
+	itemsService := items_service.New(inventoryService, inventoryRepository, gd)
 
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60

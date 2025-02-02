@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -26,11 +27,25 @@ type getCharacterResponse struct {
 type CharacterController interface {
 	Get(w http.ResponseWriter, r *http.Request)
 	GetByID(w http.ResponseWriter, r *http.Request)
+	GetState(w http.ResponseWriter, r *http.Request)
 }
 
 type characterController struct {
 	userService      user_service.UserService
 	characterService character_service.CharacterService
+	logger           *slog.Logger
+}
+
+// GetState implements CharacterController.
+func (c *characterController) GetState(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth_middleware.GetUserIDFromRequest(r)
+	if err != nil {
+		c.logger.Error("Error while get user id from request context", "error", err.Error())
+		transport_http.WriteInternalError(w)
+		return
+	}
+
+	c.logger.Info("", "", userID)
 }
 
 func writeUserCharacter(w http.ResponseWriter, char *models.Character) {
@@ -53,7 +68,12 @@ func writeUserCharacter(w http.ResponseWriter, char *models.Character) {
 
 // Get implements CharacterController.
 func (c *characterController) Get(w http.ResponseWriter, r *http.Request) {
-	userID := auth_middleware.GetUserIDFromRequest(r)
+	userID, err := auth_middleware.GetUserIDFromRequest(r)
+	if err != nil {
+		c.logger.Error("Error while get user id from request context", "error", err.Error())
+		transport_http.WriteInternalError(w)
+		return
+	}
 	char, err := c.characterService.GetByUserID(userID)
 	if err != nil {
 		transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get user character.")

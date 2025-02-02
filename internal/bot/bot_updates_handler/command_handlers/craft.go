@@ -41,7 +41,7 @@ func processErr(bot *tgbotapi.BotAPI, chatID int64, err error) {
 	bot.Send(msg)
 }
 
-func CraftItemCommand(gd *game_data.GameData, itemsService items_service.ItemsService, characterService *character_service.CharacterService, userService user_service.UserService) bot_commands_handler.HandleBotCommand {
+func CraftItemCommand(gd *game_data.GameData, itemsService items_service.ItemsService, characterService character_service.CharacterService, userService user_service.UserService) bot_commands_handler.HandleBotCommand {
 	return func(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()

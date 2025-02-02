@@ -2,7 +2,7 @@ package auth_middleware
 
 import (
 	"context"
-	"log"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -18,18 +18,22 @@ const (
 	userIDContextKey RequestContextKey = "user_id"
 )
 
-func GetUserIDFromRequest(r *http.Request) int {
+var (
+	ErrUserIDNotInjected = errors.New("cannot get user id from request context; make sure that you use GetUserIDFromRequest only with AuthMiddleware middleware")
+	ErrParsingUserID     = errors.New("cannot parse user id from token")
+)
+
+func GetUserIDFromRequest(r *http.Request) (int, error) {
 	v := r.Context().Value(userIDContextKey)
 	if userID, ok := v.(string); ok {
-		log.Println("USERID IS " + userID)
 		userIDInt, err := strconv.Atoi(userID)
 		if err != nil {
-			panic("Cannot parse user id from token...")
+			return 0, ErrParsingUserID
 		}
-		return userIDInt
+		return userIDInt, nil
 	}
 
-	panic("cannot get user id from request context. make sure that you use GetUserIDFromRequest only with AuthMiddleware middleware.")
+	return 0, ErrUserIDNotInjected
 }
 
 func AuthMiddleware(logger *slog.Logger, a authorization_service.AuthorizationService) middlewares.Middleware {

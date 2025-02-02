@@ -105,7 +105,7 @@ func formatMessage(success bool, message string, experience int, items []RewardI
 	return sb.String()
 }
 
-func processSuccessfulAdventure(ctx context.Context, gd *game_data.GameData, payload game_data.AdventureTaskPayload, charService *character_service.CharacterService, inventoryService inventory_service.InventoryService) (AdventureResult, error) {
+func processSuccessfulAdventure(ctx context.Context, gd *game_data.GameData, payload game_data.AdventureTaskPayload, charService character_service.CharacterService, inventoryService inventory_service.InventoryService) (AdventureResult, error) {
 	adventure, exists := gd.Adventures[payload.AdventureID]
 	if !exists {
 		return AdventureResult{Error: fmt.Errorf("provided adventure in task is not exists in game data files")}, fmt.Errorf("adventure not found: %s", payload.AdventureID)
@@ -156,7 +156,7 @@ func sendMessage(bot *tgbotapi.BotAPI, userID int64, message string) {
 	go bot.Send(msg)
 }
 
-func finishAdventureHandler(bot *tgbotapi.BotAPI, logger *slog.Logger, gd *game_data.GameData, charService *character_service.CharacterService, inventoryService inventory_service.InventoryService) worker.TaskHandler {
+func finishAdventureHandler(bot *tgbotapi.BotAPI, logger *slog.Logger, gd *game_data.GameData, charService character_service.CharacterService, inventoryService inventory_service.InventoryService) worker.TaskHandler {
 	return func(ctx context.Context, t models.Task) worker.TaskResult {
 		payload, err := parseAdventureTaskPayload(t.Payload)
 
