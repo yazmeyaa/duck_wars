@@ -15,6 +15,8 @@ type GameData struct {
 	Adventures       map[string]Adventure
 	AdventureRewards map[string]AdventureRewards
 	logger           *slog.Logger
+
+	ctorOpts GameDataConstructor
 }
 
 type GameDataConstructor struct {
@@ -73,6 +75,7 @@ func (gd *GameData) Read(props GameDataConstructor) error {
 	gd.AdventureRewards = adventuresRewardsData
 
 	gd.logger.Info("All game data loaded successfully!")
+	gd.ctorOpts = props
 
 	return nil
 }
