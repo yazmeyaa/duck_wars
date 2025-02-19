@@ -26,7 +26,7 @@ var (
 
 func main() {
 	cfg := config.New()
-	logger := logger.New()
+	logger := logger.New("task_handler")
 	db, err := database.New(cfg)
 	if err != nil {
 		logger.Error("[Task handler]: Error while connect to database", "error", err.Error())

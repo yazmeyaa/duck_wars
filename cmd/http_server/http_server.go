@@ -24,7 +24,7 @@ var (
 )
 
 func main() {
-	logger := logger.New()
+	logger := logger.New("http_server")
 	cfg := config.New()
 	gd := game_data.NewGameData(logger)
 	if err := gd.ReadFolderDefaultFiles(resourcesFilePath); err != nil {

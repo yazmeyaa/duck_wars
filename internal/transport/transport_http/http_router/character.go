@@ -17,6 +17,10 @@ func newCharactersHandler(characterController http_controllers.CharacterControll
 		http.HandlerFunc(characterController.Get),
 		auth_middleware.AuthMiddleware(logger, authorizationService)),
 	)
+	router.Handle("GET /state", middlewares.ApplyMiddleware(
+		http.HandlerFunc(characterController.GetState),
+		auth_middleware.AuthMiddleware(logger, authorizationService)),
+	)
 	router.HandleFunc("GET /{id}", characterController.GetByID)
 
 	return router

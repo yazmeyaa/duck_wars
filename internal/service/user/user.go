@@ -14,12 +14,18 @@ type UserService interface {
 	Delete(ctx context.Context, id int) error
 	GetByID(ctx context.Context, id int) (*models.User, error)
 	GetByTelegramID(ctx context.Context, id int64) (*models.User, error)
+	GetState(ctx context.Context, id int) (*models.CharacterState, error)
 }
 
 type userService struct {
 	logger              *slog.Logger
 	userRepository      user_repository.UserRepository
 	characterRepository character_repository.CharacterRepository
+}
+
+// GetState implements UserService.
+func (u *userService) GetState(ctx context.Context, id int) (*models.CharacterState, error) {
+	return u.userRepository.GetCharacterState(ctx, id)
 }
 
 // Create implements UserService.

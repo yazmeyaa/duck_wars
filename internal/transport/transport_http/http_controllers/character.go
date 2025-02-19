@@ -1,12 +1,14 @@
 package http_controllers
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/yazmeyaa/duck_wars/internal/models"
 	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
@@ -44,8 +46,28 @@ func (c *characterController) GetState(w http.ResponseWriter, r *http.Request) {
 		transport_http.WriteInternalError(w)
 		return
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
 
-	c.logger.Info("", "", userID)
+	char, err := c.characterService.GetByUserID(userID)
+	if err != nil {
+		transport_http.WriteError(w, http.StatusNotFound, "Cannot find character linked to user.")
+		return
+	}
+
+	state, err := c.characterService.GetCharacterState(ctx, char.ID)
+	if err != nil {
+		transport_http.WriteInternalError(w)
+		return
+	}
+
+	if err := transport_http.WriteJSON(w, state); err != nil {
+		c.logger.Error("Error while write user state", "error", err.Error())
+		transport_http.WriteInternalError(w)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func writeUserCharacter(w http.ResponseWriter, char *models.Character) {
