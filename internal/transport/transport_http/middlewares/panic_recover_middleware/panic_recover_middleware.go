@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
 )
 
 func PanicRecoveryMiddleware(logger *slog.Logger) middlewares.Middleware {

@@ -3,7 +3,7 @@ package cors_middleware
 import (
 	"net/http"
 
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
 )
 
 // var allowedOrigins = []string{"http://localhost:3000", "http://localhost:5173", "http://192.168.1.35:3000"}

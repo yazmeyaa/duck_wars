@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	"github.com/yazmeyaa/duck_wars/internal/models"
-	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
-	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	"github.com/yazmeyaa/ton_game/internal/models"
+	inventory_repository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
+	inventory_service "github.com/yazmeyaa/ton_game/internal/service/inventory"
 )
 
 var (

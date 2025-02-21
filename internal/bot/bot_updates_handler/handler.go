@@ -5,14 +5,14 @@ import (
 	"log/slog"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/yazmeyaa/duck_wars/internal/bot/bot_updates_handler/command_handlers"
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
-	items_service "github.com/yazmeyaa/duck_wars/internal/service/items"
-	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/pkg/bot_commands_handler"
-	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
+	"github.com/yazmeyaa/ton_game/internal/bot/bot_updates_handler/command_handlers"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	characterService "github.com/yazmeyaa/ton_game/internal/service/character"
+	inventoryService "github.com/yazmeyaa/ton_game/internal/service/inventory"
+	itemsService "github.com/yazmeyaa/ton_game/internal/service/items"
+	userService "github.com/yazmeyaa/ton_game/internal/service/user"
+	"github.com/yazmeyaa/ton_game/pkg/bot_commands_handler"
+	"github.com/yazmeyaa/ton_game/pkg/scheduler"
 )
 
 type BotUpdateHandler struct {
@@ -46,16 +46,16 @@ func (h *BotUpdateHandler) HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.U
 
 func New(
 	gd *game_data.GameData,
-	sheduler *sheduler.Sheduler,
-	userService user_service.UserService,
-	characterService character_service.CharacterService,
-	inventoryService inventory_service.InventoryService,
-	itemsService items_service.ItemsService,
+	scheduler *scheduler.Scheduler,
+	userService userService.UserService,
+	characterService characterService.CharacterService,
+	inventoryService inventoryService.InventoryService,
+	itemsService itemsService.ItemsService,
 	logger *slog.Logger,
 ) *BotUpdateHandler {
 	commandsHandler := command_handlers.NewCommandsHandler(
 		gd,
-		sheduler,
+		scheduler,
 		userService,
 		characterService,
 		inventoryService,

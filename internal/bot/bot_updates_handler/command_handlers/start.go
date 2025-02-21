@@ -6,16 +6,16 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/pkg/bot_commands_handler"
+	characterService "github.com/yazmeyaa/ton_game/internal/service/character"
+	userService "github.com/yazmeyaa/ton_game/internal/service/user"
+	"github.com/yazmeyaa/ton_game/pkg/bot_commands_handler"
 )
 
-func HandleStartCommand(userService user_service.UserService, characterService character_service.CharacterService, logger *slog.Logger) bot_commands_handler.HandleBotCommand {
+func HandleStartCommand(userSvc userService.UserService, characterService characterService.CharacterService, logger *slog.Logger) bot_commands_handler.HandleBotCommand {
 	return func(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 		defer cancel()
-		userID, err := userService.Create(ctx, user_service.CreateUserDTO{
+		userID, err := userSvc.Create(ctx, userService.CreateUserDTO{
 			TelegramID:    update.SentFrom().ID,
 			CharacterName: update.SentFrom().FirstName,
 		})

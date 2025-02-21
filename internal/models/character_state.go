@@ -1,8 +1,25 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type State string
+
+func (s State) MarshalBinary() (data []byte, err error) {
+	return []byte(s), nil
+}
+
+func (s *State) UnmarshalBinary(data []byte) error {
+	switch State(data) {
+	case STATE_IDLE, STATE_IN_ADVENTURE, STATE_CRAFTING:
+		*s = State(data)
+		return nil
+	default:
+		return errors.New("invalid state value")
+	}
+}
 
 const (
 	STATE_IDLE         State = "idle"

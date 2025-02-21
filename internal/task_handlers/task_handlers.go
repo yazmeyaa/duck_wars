@@ -4,11 +4,11 @@ import (
 	"log/slog"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
-	"github.com/yazmeyaa/duck_wars/pkg/models"
-	"github.com/yazmeyaa/duck_wars/pkg/worker"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	character_service "github.com/yazmeyaa/ton_game/internal/service/character"
+	inventory_service "github.com/yazmeyaa/ton_game/internal/service/inventory"
+	"github.com/yazmeyaa/ton_game/pkg/models"
+	"github.com/yazmeyaa/ton_game/pkg/worker"
 )
 
 func FailedTask(t models.Task, reason string, logger *slog.Logger) worker.TaskResult {

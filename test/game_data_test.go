@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
 )
 
 func TestGameData(t *testing.T) {

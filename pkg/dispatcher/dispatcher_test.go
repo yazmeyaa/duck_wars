@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yazmeyaa/duck_wars/internal/config"
-	"github.com/yazmeyaa/duck_wars/internal/database"
-	"github.com/yazmeyaa/duck_wars/pkg/dispatcher"
-	"github.com/yazmeyaa/duck_wars/pkg/models"
-	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
-	"github.com/yazmeyaa/duck_wars/pkg/worker"
+	"github.com/yazmeyaa/ton_game/internal/config"
+	"github.com/yazmeyaa/ton_game/internal/database"
+	"github.com/yazmeyaa/ton_game/pkg/dispatcher"
+	"github.com/yazmeyaa/ton_game/pkg/models"
+	"github.com/yazmeyaa/ton_game/pkg/scheduler"
+	"github.com/yazmeyaa/ton_game/pkg/worker"
 )
 
 func handleTask(ctx context.Context, t models.Task) worker.TaskResult {

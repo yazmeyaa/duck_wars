@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yazmeyaa/duck_wars/internal/models"
-	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
+	"github.com/yazmeyaa/ton_game/internal/models"
+	character_repository "github.com/yazmeyaa/ton_game/internal/repository/character"
 )
 
 type characterService struct {

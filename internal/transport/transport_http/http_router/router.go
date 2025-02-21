@@ -4,17 +4,18 @@ import (
 	"log/slog"
 	"net/http"
 
-	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/http_controllers"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares/cors_middleware"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares/logger_middleware"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares/panic_recover_middleware"
+	authorization_service "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/http_controllers"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares/cors_middleware"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares/logger_middleware"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares/panic_recover_middleware"
 )
 
 type RouterConstructor struct {
 	CharacterController      http_controllers.CharacterController
 	AuthenticationController http_controllers.AuthenticationController
+	ResourcesController      http_controllers.ResourcesController
 	Logger                   *slog.Logger
 	AuthorizationService     authorization_service.AuthorizationService
 }
@@ -26,6 +27,9 @@ func New(c RouterConstructor) http.Handler {
 
 	authRouter := setupAuthRouter(c.AuthenticationController)
 	v1.Handle("/auth/", http.StripPrefix("/auth", authRouter))
+
+	resources := setupResourcesRouter(c.ResourcesController)
+	v1.Handle("/resources/", http.StripPrefix("/resources", resources))
 
 	root := http.NewServeMux()
 	root.Handle("/v1/", http.StripPrefix("/v1", v1))

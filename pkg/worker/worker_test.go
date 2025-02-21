@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yazmeyaa/duck_wars/pkg/models"
-	"github.com/yazmeyaa/duck_wars/pkg/worker"
+	"github.com/yazmeyaa/ton_game/pkg/models"
+	"github.com/yazmeyaa/ton_game/pkg/worker"
 )
 
 func TestWorker(t *testing.T) {

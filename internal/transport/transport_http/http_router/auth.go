@@ -3,7 +3,7 @@ package http_router
 import (
 	"net/http"
 
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/http_controllers"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/http_controllers"
 )
 
 func setupAuthRouter(a http_controllers.AuthenticationController) http.Handler {

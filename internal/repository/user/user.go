@@ -10,8 +10,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/redis/go-redis/v9"
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	"github.com/yazmeyaa/duck_wars/internal/models"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	"github.com/yazmeyaa/ton_game/internal/models"
 )
 
 const dbName = "users"

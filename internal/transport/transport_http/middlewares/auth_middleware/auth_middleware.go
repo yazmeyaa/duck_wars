@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
-	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares"
+	authorization_service "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
 )
 
 type RequestContextKey string
@@ -58,8 +58,6 @@ func AuthMiddleware(logger *slog.Logger, a authorization_service.AuthorizationSe
 				transport_http.WriteError(w, http.StatusInternalServerError, "Internal error, please try again later...")
 				return
 			}
-
-			logger.Info("Subject claim", "sub", sub)
 
 			ctx := context.WithValue(r.Context(), userIDContextKey, sub)
 			next.ServeHTTP(w, r.WithContext(ctx))

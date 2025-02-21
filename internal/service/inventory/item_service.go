@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/yazmeyaa/duck_wars/internal/models"
-	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
+	"github.com/yazmeyaa/ton_game/internal/models"
+	inventory_repository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
 )
 
 type ItemDTO struct {

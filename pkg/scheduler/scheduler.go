@@ -1,25 +1,25 @@
-package sheduler
+package scheduler
 
 import (
 	"database/sql"
 	"log/slog"
 	"time"
 
-	"github.com/yazmeyaa/duck_wars/pkg/models"
+	"github.com/yazmeyaa/ton_game/pkg/models"
 )
 
-type SheduleTask struct {
-	Command    string
-	Payload    string
-	SheduledAt time.Time
+type ScheduleTask struct {
+	Command     string
+	Payload     string
+	ScheduledAt time.Time
 }
 
-type Sheduler struct {
+type Scheduler struct {
 	db     *sql.DB
 	logger *slog.Logger
 }
 
-func (s *Sheduler) SheduleTask(task models.Task) (id string, err error) {
+func (s *Scheduler) ScheduleTask(task models.Task) (id string, err error) {
 	row := s.db.QueryRow("INSERT INTO tasks (command, payload, sheduled_at, status) VALUES ($1, $2, $3, 'pending') RETURNING id",
 		task.Command,
 		task.Payload,
@@ -32,8 +32,8 @@ func (s *Sheduler) SheduleTask(task models.Task) (id string, err error) {
 	return id, nil
 }
 
-func NewSheduler(db *sql.DB, logger *slog.Logger) *Sheduler {
-	return &Sheduler{
+func NewScheduler(db *sql.DB, logger *slog.Logger) *Scheduler {
+	return &Scheduler{
 		db:     db,
 		logger: logger,
 	}

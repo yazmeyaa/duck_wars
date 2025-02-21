@@ -8,12 +8,12 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/pkg/bot_commands_handler"
-	"github.com/yazmeyaa/duck_wars/pkg/models"
-	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	characterService "github.com/yazmeyaa/ton_game/internal/service/character"
+	userService "github.com/yazmeyaa/ton_game/internal/service/user"
+	"github.com/yazmeyaa/ton_game/pkg/bot_commands_handler"
+	"github.com/yazmeyaa/ton_game/pkg/models"
+	"github.com/yazmeyaa/ton_game/pkg/scheduler"
 )
 
 func validateAdventureArguments(argsStr string) bool {
@@ -35,7 +35,7 @@ func extractAdventureID(argsStr string) string {
 	return adventure
 }
 
-func HandleAdventureCommand(sheduler *sheduler.Sheduler, gd *game_data.GameData, userService user_service.UserService, characterService character_service.CharacterService) bot_commands_handler.HandleBotCommand {
+func HandleAdventureCommand(scheduler *scheduler.Scheduler, gd *game_data.GameData, userService userService.UserService, characterService characterService.CharacterService) bot_commands_handler.HandleBotCommand {
 	return func(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
@@ -80,7 +80,7 @@ func HandleAdventureCommand(sheduler *sheduler.Sheduler, gd *game_data.GameData,
 			Payload:    string(payloadBytes),
 			SheduledAt: time.Now().Add(time.Second * time.Duration(adventure.Duration)),
 		}
-		_, err = sheduler.SheduleTask(task)
+		_, err = scheduler.ScheduleTask(task)
 		if err != nil {
 			processErr(bot, chatID, err)
 			return

@@ -7,11 +7,11 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	items_service "github.com/yazmeyaa/duck_wars/internal/service/items"
-	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/pkg/bot_commands_handler"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	characterService "github.com/yazmeyaa/ton_game/internal/service/character"
+	itemsService "github.com/yazmeyaa/ton_game/internal/service/items"
+	userService "github.com/yazmeyaa/ton_game/internal/service/user"
+	"github.com/yazmeyaa/ton_game/pkg/bot_commands_handler"
 )
 
 func validateCraftCommand(argsStr string, gd *game_data.GameData) bool {
@@ -30,7 +30,7 @@ func validateCraftCommand(argsStr string, gd *game_data.GameData) bool {
 	return exist
 }
 
-func extractReciepeID(argsStr string) string {
+func extractRecipeID(argsStr string) string {
 	args := strings.Split(argsStr, " ")
 
 	return args[0]
@@ -38,10 +38,13 @@ func extractReciepeID(argsStr string) string {
 
 func processErr(bot *tgbotapi.BotAPI, chatID int64, err error) {
 	msg := tgbotapi.NewMessage(chatID, err.Error())
-	bot.Send(msg)
+	_, err = bot.Send(msg)
+	if err != nil {
+		return
+	}
 }
 
-func CraftItemCommand(gd *game_data.GameData, itemsService items_service.ItemsService, characterService character_service.CharacterService, userService user_service.UserService) bot_commands_handler.HandleBotCommand {
+func CraftItemCommand(gd *game_data.GameData, itemsService itemsService.ItemsService, characterService characterService.CharacterService, userService userService.UserService) bot_commands_handler.HandleBotCommand {
 	return func(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
@@ -55,7 +58,7 @@ func CraftItemCommand(gd *game_data.GameData, itemsService items_service.ItemsSe
 			return
 		}
 
-		reciepeID := extractReciepeID(argsStr)
+		recipeID := extractRecipeID(argsStr)
 
 		user, err := userService.GetByTelegramID(ctx, userID)
 		if err != nil {
@@ -68,15 +71,20 @@ func CraftItemCommand(gd *game_data.GameData, itemsService items_service.ItemsSe
 			processErr(bot, userID, err)
 			return
 		}
-		err = itemsService.Craft(ctx, char.ID, reciepeID)
+		err = itemsService.Craft(ctx, char.ID, recipeID)
 		if err != nil {
 			processErr(bot, userID, err)
 			return
 		}
 
-		reciepe := gd.Crafts[reciepeID]
-		item := gd.Items[reciepe.ItemID]
-		msg := tgbotapi.NewMessage(userID, fmt.Sprintf("Ok! You crafted %dx %s!", reciepe.Quantity, item.Name))
-		go bot.Send(msg)
+		recipe := gd.Crafts[recipeID]
+		item := gd.Items[recipe.ItemID]
+		msg := tgbotapi.NewMessage(userID, fmt.Sprintf("Ok! You crafted %dx %s!", recipe.Quantity, item.Name))
+		go func() {
+			_, err := bot.Send(msg)
+			if err != nil {
+				return
+			}
+		}()
 	}
 }

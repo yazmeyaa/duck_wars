@@ -3,13 +3,12 @@ package authorization_service
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 
 	initdata "github.com/telegram-mini-apps/init-data-golang"
-	"github.com/yazmeyaa/duck_wars/internal/config"
+	"github.com/yazmeyaa/ton_game/internal/config"
 )
 
 type AuthorizationService interface {
@@ -61,9 +60,8 @@ func (a *authorizationService) ValidateJWT(token string) error {
 
 // ValidateTelegramData implements AuthorizationService.
 func (a *authorizationService) ValidateTelegramData(data string) error {
-	rawToken := a.appConfig.TelegramBot.Token
-	token := strings.TrimSuffix(rawToken, "/test")
-	return initdata.Validate(data, token, time.Hour*24)
+	rawToken := a.appConfig.TelegramBot.TokenNormalized
+	return initdata.Validate(data, rawToken, time.Hour*24)
 }
 
 func New(appConfig *config.Config) AuthorizationService {

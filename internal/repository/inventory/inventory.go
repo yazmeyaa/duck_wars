@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/yazmeyaa/duck_wars/internal/models"
+	"github.com/yazmeyaa/ton_game/internal/models"
 )
 
 type SingleItemDTO struct {

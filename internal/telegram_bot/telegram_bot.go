@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/yazmeyaa/duck_wars/internal/config"
+	"github.com/yazmeyaa/ton_game/internal/config"
 )
 
 var (

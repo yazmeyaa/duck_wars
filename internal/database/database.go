@@ -6,7 +6,7 @@ import (
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/yazmeyaa/duck_wars/internal/config"
+	"github.com/yazmeyaa/ton_game/internal/config"
 )
 
 func New(cfg *config.Config) (*sql.DB, error) {

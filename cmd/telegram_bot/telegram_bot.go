@@ -2,25 +2,25 @@ package main
 
 import (
 	"errors"
+	"github.com/yazmeyaa/ton_game/pkg/scheduler"
 	"log/slog"
 	"os"
 	"path/filepath"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/yazmeyaa/duck_wars/internal/bot/bot_updates_handler"
-	"github.com/yazmeyaa/duck_wars/internal/config"
-	"github.com/yazmeyaa/duck_wars/internal/database"
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	"github.com/yazmeyaa/duck_wars/internal/redis"
-	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
-	inventory_repository "github.com/yazmeyaa/duck_wars/internal/repository/inventory"
-	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
-	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	inventory_service "github.com/yazmeyaa/duck_wars/internal/service/inventory"
-	items_service "github.com/yazmeyaa/duck_wars/internal/service/items"
-	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/internal/telegram_bot"
-	"github.com/yazmeyaa/duck_wars/pkg/sheduler"
+	"github.com/yazmeyaa/ton_game/internal/bot/bot_updates_handler"
+	"github.com/yazmeyaa/ton_game/internal/config"
+	"github.com/yazmeyaa/ton_game/internal/database"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	"github.com/yazmeyaa/ton_game/internal/redis"
+	characterRepository "github.com/yazmeyaa/ton_game/internal/repository/character"
+	inventoryRepository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
+	userRepository "github.com/yazmeyaa/ton_game/internal/repository/user"
+	characterService "github.com/yazmeyaa/ton_game/internal/service/character"
+	inventoryService "github.com/yazmeyaa/ton_game/internal/service/inventory"
+	itemsService "github.com/yazmeyaa/ton_game/internal/service/items"
+	userService "github.com/yazmeyaa/ton_game/internal/service/user"
+	"github.com/yazmeyaa/ton_game/internal/telegram_bot"
 )
 
 var (
@@ -49,7 +49,7 @@ func main() {
 		os.Exit(1)
 		return
 	}
-	sheduler := sheduler.NewSheduler(db, logger)
+	shed := scheduler.NewScheduler(db, logger)
 
 	rdb, err := redis.NewRedisClient(cfg)
 	if err != nil {
@@ -65,20 +65,20 @@ func main() {
 		return
 	}
 
-	userRepository := user_repository.New(db, rdb, gd)
-	characterRepository := character_repository.NewPostgres(db)
-	inventoryRepository := inventory_repository.New(db)
-	userService := user_service.New(logger, userRepository, characterRepository)
-	characterService := character_service.New(characterRepository, logger)
-	inventoryService := inventory_service.New(inventoryRepository, logger)
-	itemsService := items_service.New(inventoryService, inventoryRepository, gd)
+	userRepo := userRepository.New(db, rdb, gd)
+	characterRepo := characterRepository.NewPostgres(db)
+	inventoryRepo := inventoryRepository.New(db)
+	userSvc := userService.New(logger, userRepo, characterRepo)
+	characterSvc := characterService.New(characterRepo, logger)
+	inventorySvc := inventoryService.New(inventoryRepo, logger)
+	itemsSvc := itemsService.New(inventorySvc, inventoryRepo, gd)
 
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
 
-	updatesHandler := bot_updates_handler.New(gd, sheduler, userService, characterService, inventoryService, itemsService, logger)
+	updatesHandler := bot_updates_handler.New(gd, shed, userSvc, characterSvc, inventorySvc, itemsSvc, logger)
 
 	for update := range updates {
 		updatesHandler.HandleUpdate(bot, &update)

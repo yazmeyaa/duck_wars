@@ -10,10 +10,10 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	initdata "github.com/telegram-mini-apps/init-data-golang"
-	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
-	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
-	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http"
+	user_repository "github.com/yazmeyaa/ton_game/internal/repository/user"
+	authorization_service "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	user_service "github.com/yazmeyaa/ton_game/internal/service/user"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http"
 )
 
 type AuthenticationController interface {
@@ -124,7 +124,7 @@ func (a *authenticationController) ValidateToken(w http.ResponseWriter, r *http.
 	}
 	var body requestBody
 
-	if err := transport_http.ParseJSON(body, w, r, a.logger, fn); err != nil {
+	if err := transport_http.ParseJSON(&body, w, r, a.logger, fn); err != nil {
 		return
 	}
 

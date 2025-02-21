@@ -5,18 +5,18 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/yazmeyaa/duck_wars/internal/config"
-	"github.com/yazmeyaa/duck_wars/internal/database"
-	"github.com/yazmeyaa/duck_wars/internal/game_data"
-	"github.com/yazmeyaa/duck_wars/internal/redis"
-	character_repository "github.com/yazmeyaa/duck_wars/internal/repository/character"
-	user_repository "github.com/yazmeyaa/duck_wars/internal/repository/user"
-	authorization_service "github.com/yazmeyaa/duck_wars/internal/service/authorization"
-	character_service "github.com/yazmeyaa/duck_wars/internal/service/character"
-	user_service "github.com/yazmeyaa/duck_wars/internal/service/user"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/http_controllers"
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/http_router"
-	"github.com/yazmeyaa/duck_wars/pkg/logger"
+	"github.com/yazmeyaa/ton_game/internal/config"
+	"github.com/yazmeyaa/ton_game/internal/database"
+	"github.com/yazmeyaa/ton_game/internal/game_data"
+	"github.com/yazmeyaa/ton_game/internal/redis"
+	characterRepository "github.com/yazmeyaa/ton_game/internal/repository/character"
+	userRepository "github.com/yazmeyaa/ton_game/internal/repository/user"
+	authorizationService "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	characterService "github.com/yazmeyaa/ton_game/internal/service/character"
+	userService "github.com/yazmeyaa/ton_game/internal/service/user"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/http_controllers"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/http_router"
+	"github.com/yazmeyaa/ton_game/pkg/logger"
 )
 
 var (
@@ -24,11 +24,11 @@ var (
 )
 
 func main() {
-	logger := logger.New("http_server")
+	appLogger := logger.New("http_server")
 	cfg := config.New()
-	gd := game_data.NewGameData(logger)
+	gd := game_data.NewGameData(appLogger)
 	if err := gd.ReadFolderDefaultFiles(resourcesFilePath); err != nil {
-		logger.Error("Error while reading game data files.", "error", err.Error())
+		appLogger.Error("Error while reading game data files.", "error", err.Error())
 		os.Exit(1)
 		return
 	}
@@ -44,18 +44,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	characterRepository := character_repository.NewPostgres(db)
-	userRepository := user_repository.New(db, rdb, gd)
-	userService := user_service.New(logger, userRepository, characterRepository)
-	characterService := character_service.New(characterRepository, logger)
-	characterController := http_controllers.NewCharacterController(userService, characterService)
-	authorizationService := authorization_service.New(cfg)
-	authController := http_controllers.NewAuthenticationController(authorizationService, userService, logger)
+	characterRepo := characterRepository.NewPostgres(db)
+	userRepo := userRepository.New(db, rdb, gd)
+	userSvc := userService.New(appLogger, userRepo, characterRepo)
+	characterSvc := characterService.New(characterRepo, appLogger)
+	characterController := http_controllers.NewCharacterController(userSvc, characterSvc, appLogger)
+	authSvc := authorizationService.New(cfg)
+	authController := http_controllers.NewAuthenticationController(authSvc, userSvc, appLogger)
+	resourcesController := http_controllers.NewResourcesController(gd, appLogger)
 	router := http_router.New(http_router.RouterConstructor{
 		CharacterController:      characterController,
 		AuthenticationController: authController,
-		Logger:                   logger,
-		AuthorizationService:     authorizationService,
+		Logger:                   appLogger,
+		AuthorizationService:     authSvc,
+		ResourcesController:      resourcesController,
 	})
 
 	if err := http.ListenAndServe(":8000", router); err != nil {

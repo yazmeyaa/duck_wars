@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yazmeyaa/duck_wars/internal/transport/transport_http/middlewares"
+	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
 )
 
 func LoggerMiddleware(logger *slog.Logger) middlewares.Middleware {

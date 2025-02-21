@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -14,7 +15,8 @@ type Config struct {
 }
 
 type TelegramBot struct {
-	Token string
+	Token           string
+	TokenNormalized string
 }
 
 type JWTConfig struct {
@@ -45,6 +47,8 @@ func New() *Config {
 	return &Config{
 		TelegramBot: TelegramBot{
 			Token: getEnv("TELEGRAM_BOT_TOKEN", ""),
+			// Raw token without /test suffix
+			TokenNormalized: strings.TrimSuffix(getEnv("TELEGRAM_BOT_TOKEN", ""), "/test"),
 		},
 		Database: DatabaseConfig{
 			Host:     getEnv("DB_HOST", "localhost"),
