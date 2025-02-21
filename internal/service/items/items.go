@@ -12,7 +12,7 @@ import (
 
 var (
 	ErrItemNotFound         = errors.New("item not found")
-	ErrRecipeNotFound       = errors.New("not found reciepe")
+	ErrRecipeNotFound       = errors.New("not found recipe")
 	ErrNotEnoughIngredients = errors.New("not enough ingredients")
 )
 

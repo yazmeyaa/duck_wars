@@ -21,6 +21,10 @@ type AuthenticationController interface {
 	ValidateToken(w http.ResponseWriter, r *http.Request)
 }
 
+type AuthResponse struct {
+	Token string `json:"token"`
+}
+
 type authenticationController struct {
 	authSvc authorization_service.AuthorizationService
 	userSvc user_service.UserService
@@ -30,17 +34,22 @@ type authenticationController struct {
 func (a *authenticationController) writeToken(w http.ResponseWriter, userID int) {
 	token, err := a.authSvc.GenerateToken(userID)
 	if err != nil {
-		transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error. Cannot generate token.")
+		err := transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error. Cannot generate token.")
+		if err != nil {
+			return
+		}
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(struct {
-		Token string `json:"token"`
-	}{
+	res := AuthResponse{
 		Token: token,
-	})
+	}
+	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		return
+	}
 }
 
 // LoginViaTelegramInitData implements AuthenticationController.
@@ -56,14 +65,20 @@ func (a *authenticationController) LoginViaTelegramInitData(w http.ResponseWrite
 
 	if err := a.authSvc.ValidateTelegramData(requestData.InitData); err != nil {
 		a.logger.Error("Error while validating telegram init data", "fn", fn, "error", err.Error())
-		transport_http.WriteError(w, http.StatusUnauthorized, "Not valid token")
+		err := transport_http.WriteError(w, http.StatusUnauthorized, "Not valid token")
+		if err != nil {
+			return
+		}
 		return
 	}
 
 	data, err := initdata.Parse(requestData.InitData)
 	if err != nil {
 		a.logger.Error("Cannot parse telegram init data", "fn", fn, "error", err.Error())
-		transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error")
+		err := transport_http.WriteError(w, http.StatusInternalServerError, "Internal server error")
+		if err != nil {
+			return
+		}
 		return
 	}
 
@@ -77,14 +92,20 @@ func (a *authenticationController) LoginViaTelegramInitData(w http.ResponseWrite
 			TelegramID: data.User.ID,
 		})
 		if err != nil {
-			transport_http.WriteError(w, http.StatusInternalServerError, "Cannot create user.")
+			err := transport_http.WriteError(w, http.StatusInternalServerError, "Cannot create user.")
+			if err != nil {
+				return
+			}
 			return
 		}
 		userID = newUserID
 		a.writeToken(w, newUserID)
 		return
 	} else if err != nil {
-		transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get or create user...")
+		err := transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get or create user...")
+		if err != nil {
+			return
+		}
 		return
 	}
 	userID = user.ID
@@ -96,6 +117,10 @@ func (a *authenticationController) processValidationError(w http.ResponseWriter,
 	const fn = "processValidationError"
 	var status int
 	var message string
+
+	if err != nil {
+		logger.Error("Error while validating JWT token.", "fn", fn, "error", err.Error())
+	}
 
 	switch {
 	case errors.Is(err, jwt.ErrTokenExpired):
@@ -112,8 +137,10 @@ func (a *authenticationController) processValidationError(w http.ResponseWriter,
 		message = "Internal server error. Cannot verify token"
 	}
 
-	transport_http.WriteError(w, status, message)
-	logger.Error("Error while validating JWT token.", "fn", fn, "error", err.Error())
+	err = transport_http.WriteError(w, status, message)
+	if err != nil {
+		return
+	}
 }
 
 // ValidateToken implements AuthenticationController.
@@ -130,7 +157,10 @@ func (a *authenticationController) ValidateToken(w http.ResponseWriter, r *http.
 
 	if body.Token == "" {
 		a.logger.Error("Received empty token.", "fn", fn)
-		transport_http.WriteError(w, http.StatusBadRequest, "Received empty token.")
+		err := transport_http.WriteError(w, http.StatusBadRequest, "Received empty token.")
+		if err != nil {
+			return
+		}
 		return
 	}
 

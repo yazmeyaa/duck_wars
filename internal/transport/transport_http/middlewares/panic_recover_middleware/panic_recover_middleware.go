@@ -20,7 +20,10 @@ func PanicRecoveryMiddleware(logger *slog.Logger) middlewares.Middleware {
 					})
 					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write(jsonBody)
+					_, err := w.Write(jsonBody)
+					if err != nil {
+						return
+					}
 				}
 			}()
 			next.ServeHTTP(w, r)
