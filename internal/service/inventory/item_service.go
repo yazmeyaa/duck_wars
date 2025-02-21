@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/yazmeyaa/ton_game/internal/models"
-	inventory_repository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
+	inventoryrepository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
 )
 
 type ItemDTO struct {
@@ -24,15 +24,15 @@ type InventoryService interface {
 }
 
 type inventoryService struct {
-	repo   inventory_repository.InventoryRepository
+	repo   inventoryrepository.InventoryRepository
 	logger *slog.Logger
 }
 
 // UpdateItemsBatch implements InventoryService.
 func (i *inventoryService) UpdateItemsBatch(ctx context.Context, characterID int, items []ItemDTO) error {
-	s := make([]inventory_repository.SingleItemDTO, len(items))
+	s := make([]inventoryrepository.SingleItemDTO, len(items))
 	for _, item := range items {
-		s = append(s, inventory_repository.SingleItemDTO{
+		s = append(s, inventoryrepository.SingleItemDTO{
 			ItemID:   item.ItemID,
 			Quantity: item.Quantity,
 		})
@@ -41,7 +41,7 @@ func (i *inventoryService) UpdateItemsBatch(ctx context.Context, characterID int
 	return i.repo.UpdateItemsBatch(ctx, characterID, s)
 }
 
-func New(repo inventory_repository.InventoryRepository, logger *slog.Logger) InventoryService {
+func New(repo inventoryrepository.InventoryRepository, logger *slog.Logger) InventoryService {
 	return &inventoryService{
 		repo:   repo,
 		logger: logger,

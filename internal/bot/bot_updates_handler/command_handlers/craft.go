@@ -20,12 +20,12 @@ func validateCraftCommand(argsStr string, gd *game_data.GameData) bool {
 		return false
 	}
 
-	reciepeID := args[0]
-	if reciepeID == "" {
+	recipeID := args[0]
+	if recipeID == "" {
 		return false
 	}
 
-	_, exist := gd.Crafts[reciepeID]
+	_, exist := gd.Crafts[recipeID]
 
 	return exist
 }
@@ -54,7 +54,10 @@ func CraftItemCommand(gd *game_data.GameData, itemsService itemsService.ItemsSer
 		userID := update.FromChat().ID
 		if !validateCraftCommand(argsStr, gd) {
 			msg := tgbotapi.NewMessage(userID, "Not valid command usage")
-			bot.Send(msg)
+			_, err := bot.Send(msg)
+			if err != nil {
+				return
+			}
 			return
 		}
 

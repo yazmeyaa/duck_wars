@@ -4,13 +4,13 @@ import (
 	"log/slog"
 	"net/http"
 
-	authorization_service "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	authorizationservice "github.com/yazmeyaa/ton_game/internal/service/authorization"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/http_controllers"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares/auth_middleware"
 )
 
-func newCharactersHandler(characterController http_controllers.CharacterController, authorizationService authorization_service.AuthorizationService, logger *slog.Logger) http.Handler {
+func newCharactersHandler(characterController http_controllers.CharacterController, authorizationService authorizationservice.AuthorizationService, logger *slog.Logger) http.Handler {
 	router := http.NewServeMux()
 
 	router.Handle("GET /me", middlewares.ApplyMiddleware(

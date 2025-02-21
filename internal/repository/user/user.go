@@ -24,7 +24,6 @@ var (
 type UserRepository interface {
 	Create(ctx context.Context, data CreateUserDTO) (int, error)
 	Delete(ctx context.Context, id int) error
-	// Update(ctx context.Context, userID int, data UpdateUserDTO) error
 	GetByID(ctx context.Context, id int) (*models.User, error)
 	GetByTelegramID(ctx context.Context, id int64) (*models.User, error)
 	GetCharacterState(ctx context.Context, characterID int) (*models.CharacterState, error)
@@ -42,15 +41,15 @@ func (r *postgresRepository) getCharacterKey(characterID int) string {
 	return "char_state:" + strconv.Itoa(characterID)
 }
 
-func (r *postgresRepository) createState(ctx context.Context, hkey string) (*models.CharacterState, error) {
+func (r *postgresRepository) createState(ctx context.Context, key string) (*models.CharacterState, error) {
 	// TODO: Store somewhere initial state
 	res := models.CharacterState{
 		Energy:        5,
 		SpendEnergyAt: time.Now(),
-		State:         models.STATE_IDLE,
+		State:         models.StateIdle,
 	}
 
-	_, err := r.rc.HSet(ctx, hkey, &res).Result()
+	_, err := r.rc.HSet(ctx, key, &res).Result()
 
 	if err != nil {
 		return nil, err
@@ -106,7 +105,7 @@ func (r *postgresRepository) SpendCharacterEnergy(ctx context.Context, character
 }
 
 // GetByTelegramID implements UserRepository.
-func (u *postgresRepository) GetByTelegramID(ctx context.Context, id int64) (*models.User, error) {
+func (r *postgresRepository) GetByTelegramID(ctx context.Context, id int64) (*models.User, error) {
 	row := sq.Select(
 		"id",
 		"telegram_id",
@@ -116,7 +115,7 @@ func (u *postgresRepository) GetByTelegramID(ctx context.Context, id int64) (*mo
 		From(dbName).
 		Where(sq.Eq{"telegram_id": id}).
 		PlaceholderFormat(sq.Dollar).
-		RunWith(u.db).
+		RunWith(r.db).
 		QueryRowContext(ctx)
 
 	var user models.User
@@ -137,14 +136,14 @@ func (u *postgresRepository) GetByTelegramID(ctx context.Context, id int64) (*mo
 }
 
 // Create implements UserRepository.
-func (u *postgresRepository) Create(ctx context.Context, data CreateUserDTO) (int, error) {
+func (r *postgresRepository) Create(ctx context.Context, data CreateUserDTO) (int, error) {
 	row := sq.Insert(dbName).
 		Columns("telegram_id").
 		Values(data.TelegramID).
 		Suffix("ON CONFLICT (telegram_id) DO UPDATE SET telegram_id = EXCLUDED.telegram_id").
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar).
-		RunWith(u.db).
+		RunWith(r.db).
 		QueryRowContext(ctx)
 
 	var id int
@@ -165,18 +164,18 @@ func (u *postgresRepository) Create(ctx context.Context, data CreateUserDTO) (in
 }
 
 // Delete implements UserRepository.
-func (u *postgresRepository) Delete(ctx context.Context, id int) error {
+func (r *postgresRepository) Delete(ctx context.Context, id int) error {
 	_, err := sq.Delete(dbName).
 		Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar).
-		RunWith(u.db).
+		RunWith(r.db).
 		ExecContext(ctx)
 
 	return err
 }
 
 // GetByID implements UserRepository.
-func (u *postgresRepository) GetByID(ctx context.Context, id int) (*models.User, error) {
+func (r *postgresRepository) GetByID(ctx context.Context, id int) (*models.User, error) {
 	row := sq.Select(
 		"id",
 		"telegram_id",
@@ -186,7 +185,7 @@ func (u *postgresRepository) GetByID(ctx context.Context, id int) (*models.User,
 		From(dbName).
 		Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar).
-		RunWith(u.db).
+		RunWith(r.db).
 		QueryRowContext(ctx)
 
 	var user models.User

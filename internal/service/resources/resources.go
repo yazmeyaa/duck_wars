@@ -2,7 +2,7 @@ package resources
 
 import "io"
 
-type GameResoucesService interface {
+type GameResourcesService interface {
 	GetItems() io.Reader
 	GetCrafts() io.Reader
 	GetWeaponAttributes() io.Reader

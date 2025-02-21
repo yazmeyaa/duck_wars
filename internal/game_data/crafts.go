@@ -2,6 +2,7 @@ package game_data
 
 type ItemType string
 
+//goland:noinspection GoUnusedConst
 const (
 	RegularItem ItemType = "item"
 	WeaponType  ItemType = "weapon"

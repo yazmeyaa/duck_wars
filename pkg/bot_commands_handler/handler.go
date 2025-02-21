@@ -10,7 +10,7 @@ type HandleBotCommand func(bot *tgbotapi.BotAPI, update *tgbotapi.Update)
 type commandHandlersMap map[string]HandleBotCommand
 
 var (
-	ErrHandlerNotFound = errors.New("no registred handlers for provided command")
+	ErrHandlerNotFound = errors.New("no registered handlers for provided command")
 )
 
 type Handler struct {
@@ -19,7 +19,7 @@ type Handler struct {
 
 func (c *Handler) RegisterCommand(command string, handler HandleBotCommand) {
 	if _, exist := c.handlers[command]; exist {
-		panic("BotCommandHandler: command already registred")
+		panic("BotCommandHandler: command already registered")
 	}
 
 	c.handlers[command] = handler

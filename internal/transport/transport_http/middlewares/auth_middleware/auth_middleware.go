@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	authorization_service "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	authorizationservice "github.com/yazmeyaa/ton_game/internal/service/authorization"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
 )
@@ -36,7 +36,7 @@ func GetUserIDFromRequest(r *http.Request) (int, error) {
 	return 0, ErrUserIDNotInjected
 }
 
-func AuthMiddleware(logger *slog.Logger, a authorization_service.AuthorizationService) middlewares.Middleware {
+func AuthMiddleware(logger *slog.Logger, a authorizationservice.AuthorizationService) middlewares.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			auth := r.Header.Get("Authorization")

@@ -11,8 +11,8 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/yazmeyaa/ton_game/internal/game_data"
-	character_service "github.com/yazmeyaa/ton_game/internal/service/character"
-	inventory_service "github.com/yazmeyaa/ton_game/internal/service/inventory"
+	characterservice "github.com/yazmeyaa/ton_game/internal/service/character"
+	inventoryservice "github.com/yazmeyaa/ton_game/internal/service/inventory"
 	"github.com/yazmeyaa/ton_game/pkg/models"
 	"github.com/yazmeyaa/ton_game/pkg/worker"
 )
@@ -60,7 +60,7 @@ func calculateRewards(gd *game_data.GameData, adventureID string) ([]RewardItem,
 	for _, reward := range rewards.Rewards {
 		if randChanceFloat32(reward.Chance) {
 			item, exist := gd.Items[reward.ItemID]
-			var title string = reward.ItemID
+			var title = reward.ItemID
 			if exist {
 				title = item.Name
 			}
@@ -83,7 +83,7 @@ func parseAdventureTaskPayload(payload string) (game_data.AdventureTaskPayload, 
 	return result, nil
 }
 
-func calculateExpirience(rewards game_data.AdventureRewards) int {
+func calculateExperience(rewards game_data.AdventureRewards) int {
 	return randMinMax(rewards.Experience.Min, rewards.Experience.Max)
 }
 
@@ -105,7 +105,7 @@ func formatMessage(success bool, message string, experience int, items []RewardI
 	return sb.String()
 }
 
-func processSuccessfulAdventure(ctx context.Context, gd *game_data.GameData, payload game_data.AdventureTaskPayload, charService character_service.CharacterService, inventoryService inventory_service.InventoryService) (AdventureResult, error) {
+func processSuccessfulAdventure(ctx context.Context, gd *game_data.GameData, payload game_data.AdventureTaskPayload, charService characterservice.CharacterService, inventoryService inventoryservice.InventoryService) (AdventureResult, error) {
 	adventure, exists := gd.Adventures[payload.AdventureID]
 	if !exists {
 		return AdventureResult{Error: fmt.Errorf("provided adventure in task is not exists in game data files")}, fmt.Errorf("adventure not found: %s", payload.AdventureID)
@@ -115,15 +115,15 @@ func processSuccessfulAdventure(ctx context.Context, gd *game_data.GameData, pay
 		return AdventureResult{Error: fmt.Errorf("failed to calculate rewards")}, fmt.Errorf("failed to calculate rewards for adventure: %s", payload.AdventureID)
 	}
 	adventureRewards := gd.AdventureRewards[payload.AdventureID]
-	experience := calculateExpirience(adventureRewards)
+	experience := calculateExperience(adventureRewards)
 	err := charService.AddExperience(payload.CharacterID, float64(experience))
 	if err != nil {
 		return AdventureResult{Error: fmt.Errorf("failed to add xp: %w", err)}, fmt.Errorf("error adding experience: %w", err)
 	}
 	for _, item := range items {
 		ctx, cancel := context.WithTimeout(ctx, time.Second*4)
-		defer cancel()
 		err := inventoryService.AddItem(ctx, item.ItemID, payload.CharacterID, uint16(item.Quantity))
+		cancel()
 		if err != nil {
 			return AdventureResult{Error: fmt.Errorf("error adding item to user inventory: %w", err)}, fmt.Errorf("error adding item %s to inventory for character %d: %w", item.ItemID, payload.CharacterID, err)
 		}
@@ -161,7 +161,7 @@ func sendMessage(bot *tgbotapi.BotAPI, userID int64, message string) {
 	}()
 }
 
-func finishAdventureHandler(bot *tgbotapi.BotAPI, logger *slog.Logger, gd *game_data.GameData, charService character_service.CharacterService, inventoryService inventory_service.InventoryService) worker.TaskHandler {
+func finishAdventureHandler(bot *tgbotapi.BotAPI, logger *slog.Logger, gd *game_data.GameData, charService characterservice.CharacterService, inventoryService inventoryservice.InventoryService) worker.TaskHandler {
 	return func(ctx context.Context, t models.Task) worker.TaskResult {
 		payload, err := parseAdventureTaskPayload(t.Payload)
 

@@ -48,12 +48,12 @@ func (w *Worker) Run() {
 		select {
 		case task, ok := <-w.taskChan:
 			if !ok {
-				w.logger.Info("Worker: task channel closed\n", "wokerID", w.id)
+				w.logger.Info("Worker: task channel closed\n", "workerID", w.id)
 				break
 			}
 			w.processTask(task)
 		case <-w.ctx.Done():
-			w.logger.Info("Worker stopping\n", "wokerID", w.id, "error", w.ctx.Err().Error())
+			w.logger.Info("Worker stopping\n", "workerID", w.id, "error", w.ctx.Err().Error())
 			return
 		}
 	}
@@ -65,7 +65,7 @@ func (w *Worker) processTask(task models.Task) {
 		w.logger.Warn("No handler for command", "command", task.Command)
 		w.taskResultChan <- TaskResult{
 			ID:     task.ID,
-			Result: models.STATUS_FAILDED,
+			Result: models.StatusFailed,
 		}
 		return
 	}

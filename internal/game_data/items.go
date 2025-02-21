@@ -5,7 +5,7 @@ type Item struct {
 	Type          ItemType `json:"type"`
 	Name          string   `json:"name"`
 	Description   string   `json:"description"`
-	IsSoldable    bool     `json:"soldable"`
+	CanSold       bool     `json:"canSold"`
 	IsCraftable   bool     `json:"craftable"`
 	IsUsedInCraft bool     `json:"userInCraft"`
 }

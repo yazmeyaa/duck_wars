@@ -76,9 +76,9 @@ func HandleAdventureCommand(scheduler *scheduler.Scheduler, gd *game_data.GameDa
 			return
 		}
 		task := models.Task{
-			Command:    "finish_adventure",
-			Payload:    string(payloadBytes),
-			SheduledAt: time.Now().Add(time.Second * time.Duration(adventure.Duration)),
+			Command:     "finish_adventure",
+			Payload:     string(payloadBytes),
+			ScheduledAt: time.Now().Add(time.Second * time.Duration(adventure.Duration)),
 		}
 		_, err = scheduler.ScheduleTask(task)
 		if err != nil {

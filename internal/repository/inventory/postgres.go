@@ -42,12 +42,12 @@ func (i *postgresRepository) TransferItems(ctx context.Context, fromID int, toID
 		return err
 	}
 
-	missedItems, err := i.characterHasEnoughtItems(ctx, tx, fromID, items)
+	missedItems, err := i.characterHasEnoughItems(ctx, tx, fromID, items)
 	if err != nil {
 		return err
 	}
 	if len(missedItems) > 0 {
-		return ErrNotEnoughtItems
+		return ErrNotEnoughItems
 	}
 
 	if err := i.removeItems(ctx, tx, fromID, items); err != nil {
@@ -97,7 +97,7 @@ func (i *postgresRepository) CraftItems(ctx context.Context, characterID int, it
 	fmt.Printf("%+v\n", availableItems)
 
 	if len(removeItemsIds) != len(availableItems) {
-		return ErrNotEnoughtItems
+		return ErrNotEnoughItems
 	}
 
 	for _, itemToRemove := range itemsToRemove {
@@ -113,7 +113,7 @@ func (i *postgresRepository) CraftItems(ctx context.Context, characterID int, it
 			if err != nil {
 				return err
 			}
-			return ErrNotEnoughtItems
+			return ErrNotEnoughItems
 		}
 	}
 
@@ -213,12 +213,12 @@ func (i *postgresRepository) RemoveItem(ctx context.Context, itemID string, char
 	return err
 }
 
-func (r *postgresRepository) UpdateQuantity(ctx context.Context, characterID int, itemID string, quantityDelta int) error {
+func (i *postgresRepository) UpdateQuantity(ctx context.Context, characterID int, itemID string, quantityDelta int) error {
 	if quantityDelta == 0 {
 		return ErrZeroQuantity
 	}
 
-	tx, err := r.db.Begin()
+	tx, err := i.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -418,7 +418,7 @@ func (i *postgresRepository) addItems(ctx context.Context, exec Executer, charac
 	return err
 }
 
-func (i *postgresRepository) characterHasEnoughtItems(ctx context.Context, q Queryer, characterID int, requiredItems []SingleItemDTO) ([]MissedItem, error) {
+func (i *postgresRepository) characterHasEnoughItems(ctx context.Context, q Queryer, characterID int, requiredItems []SingleItemDTO) ([]MissedItem, error) {
 	ids := i.getItemsIds(requiredItems)
 	availableItems, err := i.getItems(ctx, q, characterID, ids)
 	if err != nil {

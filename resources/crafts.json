@@ -23,7 +23,7 @@
             }
         ]
     },
-    "wooden_beams_reciepe_1": {
+    "wooden_beams_recipe_1": {
         "id": "wooden_sword_recipe_1",
         "item_id": "wooden_beams",
         "quantity": 1,

@@ -21,18 +21,18 @@ func TestWorker(t *testing.T) {
 	go newWorker.Run()
 
 	task := models.Task{
-		ID:         "123",
-		Command:    "finish_adventure",
-		Payload:    "123",
-		TaskStatus: models.STATUS_PENDING,
-		CreatedAt:  time.Now(),
-		SheduledAt: time.Now().Add(time.Second * 5),
+		ID:          "123",
+		Command:     "finish_adventure",
+		Payload:     "123",
+		TaskStatus:  models.StatusPending,
+		CreatedAt:   time.Now(),
+		ScheduledAt: time.Now().Add(time.Second * 5),
 	}
 
 	ch <- task
 	res := <-taskResultChan
 
-	if res.Result != models.STATUS_COMPLETED {
+	if res.Result != models.StatusCompleted {
 		t.FailNow()
 	}
 }

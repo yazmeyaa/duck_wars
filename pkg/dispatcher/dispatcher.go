@@ -83,7 +83,7 @@ func (d *Dispatcher) loadTasks() ([]models.Task, error) {
 			&task.Command,
 			&task.Payload,
 			&task.TaskStatus,
-			&task.SheduledAt,
+			&task.ScheduledAt,
 			&task.CreatedAt,
 		); err != nil {
 			err := tx.Rollback()

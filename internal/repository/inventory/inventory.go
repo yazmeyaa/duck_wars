@@ -13,9 +13,9 @@ type SingleItemDTO struct {
 }
 
 var (
-	ErrZeroQuantity    = errors.New("provided zero quantity")
-	ErrItemNotFound    = errors.New("item not found")
-	ErrNotEnoughtItems = errors.New("not enought items")
+	ErrZeroQuantity   = errors.New("provided zero quantity")
+	ErrItemNotFound   = errors.New("item not found")
+	ErrNotEnoughItems = errors.New("not enough items")
 )
 
 const (

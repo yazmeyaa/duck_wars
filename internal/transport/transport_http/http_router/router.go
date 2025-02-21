@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	authorization_service "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	authorizationservice "github.com/yazmeyaa/ton_game/internal/service/authorization"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/http_controllers"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares/cors_middleware"
@@ -17,7 +17,7 @@ type RouterConstructor struct {
 	AuthenticationController http_controllers.AuthenticationController
 	ResourcesController      http_controllers.ResourcesController
 	Logger                   *slog.Logger
-	AuthorizationService     authorization_service.AuthorizationService
+	AuthorizationService     authorizationservice.AuthorizationService
 }
 
 func New(c RouterConstructor) http.Handler {

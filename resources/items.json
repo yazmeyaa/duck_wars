@@ -4,7 +4,7 @@
         "type": "item",
         "name": "Tree stick",
         "description": "This was once part of a tree",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -13,7 +13,7 @@
         "type": "item",
         "name": "Wood log",
         "description": "Piece of wood",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -22,7 +22,7 @@
         "type": "item",
         "name": "Wooden beams",
         "description": "Processed wood",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -31,7 +31,7 @@
         "type": "item",
         "name": "Stone",
         "description": "Just a regular stone",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -40,7 +40,7 @@
         "type": "item",
         "name": "Coal",
         "description": "Very valuable resource for blacksmiths.",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -49,7 +49,7 @@
         "type": "item",
         "name": "Copper ore",
         "description": "Can be melted down into copper ingots",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -58,7 +58,7 @@
         "type": "item",
         "name": "Tree fibers",
         "description": "Fibers obtained from felling trees",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -67,7 +67,7 @@
         "type": "item",
         "name": "Rope",
         "description": "A simple rope, a necessary thing in everyday life",
-        "soldable": true,
+        "canSold": true,
         "craftable": true,
         "usedInCraft": true
     },
@@ -76,7 +76,7 @@
         "type": "weapon",
         "name": "Wooden sword",
         "description": "A sword made of wood",
-        "soldable": true,
+        "canSold": true,
         "craftable": true,
         "usedInCraft": false
     },
@@ -85,7 +85,7 @@
         "type": "item",
         "name": "Animal skin",
         "description": "Skin taken from an animal",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -94,7 +94,7 @@
         "type": "item",
         "name": "Leather",
         "description": "Skin taken from an animal",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     },
@@ -103,7 +103,7 @@
         "type": "item",
         "name": "Strips of leather",
         "description": "Skin taken from an animal",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     }

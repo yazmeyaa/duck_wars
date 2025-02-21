@@ -6,8 +6,8 @@ import (
 
 	"github.com/yazmeyaa/ton_game/internal/game_data"
 	"github.com/yazmeyaa/ton_game/internal/models"
-	inventory_repository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
-	inventory_service "github.com/yazmeyaa/ton_game/internal/service/inventory"
+	inventoryrepository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
+	inventoryservice "github.com/yazmeyaa/ton_game/internal/service/inventory"
 )
 
 var (
@@ -19,29 +19,29 @@ var (
 type ItemsService interface {
 	Craft(ctx context.Context, characterID int, recipeID string) error
 	GetRecipes(itemID string) []game_data.CraftRecipe
-	Transfer(ctx context.Context, item inventory_repository.SingleItemDTO, characterID int, targetCharacterID int) error
+	Transfer(ctx context.Context, item inventoryrepository.SingleItemDTO, characterID int, targetCharacterID int) error
 	Destroy(ctx context.Context, characterID int, itemID string, quantity uint16) error
 	Add(ctx context.Context, characterID int, itemID string, quantity uint16) error
 	GetInfo(ctx context.Context, characterID int, itemID string) (*models.InventoryItem, error)
 }
 
 type itemsService struct {
-	inventoryService    inventory_service.InventoryService
-	inventoryRepository inventory_repository.InventoryRepository
+	inventoryService    inventoryservice.InventoryService
+	inventoryRepository inventoryrepository.InventoryRepository
 	gameData            *game_data.GameData
 }
 
 // GetRecipes implements ItemsService.
 func (i *itemsService) GetRecipes(itemID string) []game_data.CraftRecipe {
-	var reciepes []game_data.CraftRecipe
+	var recipes []game_data.CraftRecipe
 
-	for _, reciepe := range i.gameData.Crafts {
-		if reciepe.ItemID == itemID {
-			reciepes = append(reciepes, reciepe)
+	for _, recipe := range i.gameData.Crafts {
+		if recipe.ItemID == itemID {
+			recipes = append(recipes, recipe)
 		}
 	}
 
-	return reciepes
+	return recipes
 }
 
 // Add implements ItemsService.
@@ -51,23 +51,23 @@ func (i *itemsService) Add(ctx context.Context, characterID int, itemID string, 
 
 // Craft implements ItemsService.
 func (i *itemsService) Craft(ctx context.Context, characterID int, recipeID string) error {
-	reciepe, exist := i.gameData.Crafts[recipeID]
+	recipe, exist := i.gameData.Crafts[recipeID]
 	if !exist {
 		return ErrRecipeNotFound
 	}
 
-	itemsToRemove := make([]inventory_repository.SingleItemDTO, len(reciepe.Items))
-	for idx, item := range reciepe.Items {
-		itemsToRemove[idx] = inventory_repository.SingleItemDTO{
+	itemsToRemove := make([]inventoryrepository.SingleItemDTO, len(recipe.Items))
+	for idx, item := range recipe.Items {
+		itemsToRemove[idx] = inventoryrepository.SingleItemDTO{
 			ItemID:   item.ItemID,
 			Quantity: item.Quantity,
 		}
 	}
-	itemToCraft := inventory_repository.SingleItemDTO{
-		ItemID:   reciepe.ItemID,
-		Quantity: uint16(reciepe.Quantity),
+	itemToCraft := inventoryrepository.SingleItemDTO{
+		ItemID:   recipe.ItemID,
+		Quantity: uint16(recipe.Quantity),
 	}
-	err := i.inventoryRepository.CraftItems(ctx, characterID, itemsToRemove, []inventory_repository.SingleItemDTO{itemToCraft})
+	err := i.inventoryRepository.CraftItems(ctx, characterID, itemsToRemove, []inventoryrepository.SingleItemDTO{itemToCraft})
 	if err != nil {
 		return err
 	}
@@ -87,11 +87,11 @@ func (i *itemsService) GetInfo(ctx context.Context, characterID int, itemID stri
 }
 
 // Transfer implements ItemsService.
-func (i *itemsService) Transfer(ctx context.Context, item inventory_repository.SingleItemDTO, characterID int, targetCharacterID int) error {
-	return i.inventoryRepository.TransferItems(ctx, characterID, targetCharacterID, []inventory_repository.SingleItemDTO{item})
+func (i *itemsService) Transfer(ctx context.Context, item inventoryrepository.SingleItemDTO, characterID int, targetCharacterID int) error {
+	return i.inventoryRepository.TransferItems(ctx, characterID, targetCharacterID, []inventoryrepository.SingleItemDTO{item})
 }
 
-func New(inventoryService inventory_service.InventoryService, inventoryRepository inventory_repository.InventoryRepository, gameData *game_data.GameData) ItemsService {
+func New(inventoryService inventoryservice.InventoryService, inventoryRepository inventoryrepository.InventoryRepository, gameData *game_data.GameData) ItemsService {
 	return &itemsService{
 		inventoryService:    inventoryService,
 		inventoryRepository: inventoryRepository,

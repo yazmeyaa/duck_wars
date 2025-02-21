@@ -36,7 +36,7 @@ func HandleStartCommand(userSvc userService.UserService, characterService charac
 			return
 		}
 
-		msgTxt := characterService.CharacterTextDecsription(char)
+		msgTxt := characterService.CharacterTextDescription(char)
 
 		msg := tgbotapi.NewMessage(update.FromChat().ID, msgTxt)
 		go bot.Send(msg)

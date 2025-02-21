@@ -4,7 +4,7 @@
         "type": "item",
         "name": "Tree stick",
         "description": "This was once part of a tree",
-        "soldable": true,
+        "canSold": true,
         "craftable": false,
         "usedInCraft": true
     }

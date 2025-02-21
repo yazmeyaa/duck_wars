@@ -5,8 +5,8 @@ import (
 	"log/slog"
 
 	"github.com/yazmeyaa/ton_game/internal/models"
-	character_repository "github.com/yazmeyaa/ton_game/internal/repository/character"
-	user_repository "github.com/yazmeyaa/ton_game/internal/repository/user"
+	characterrepository "github.com/yazmeyaa/ton_game/internal/repository/character"
+	userrepository "github.com/yazmeyaa/ton_game/internal/repository/user"
 )
 
 type UserService interface {
@@ -19,8 +19,8 @@ type UserService interface {
 
 type userService struct {
 	logger              *slog.Logger
-	userRepository      user_repository.UserRepository
-	characterRepository character_repository.CharacterRepository
+	userRepository      userrepository.UserRepository
+	characterRepository characterrepository.CharacterRepository
 }
 
 // GetState implements UserService.
@@ -30,7 +30,7 @@ func (u *userService) GetState(ctx context.Context, id int) (*models.CharacterSt
 
 // Create implements UserService.
 func (u *userService) Create(ctx context.Context, data CreateUserDTO) (int, error) {
-	id, err := u.userRepository.Create(ctx, user_repository.CreateUserDTO{
+	id, err := u.userRepository.Create(ctx, userrepository.CreateUserDTO{
 		TelegramID: data.TelegramID,
 	})
 
@@ -39,7 +39,7 @@ func (u *userService) Create(ctx context.Context, data CreateUserDTO) (int, erro
 		return 0, err
 	}
 
-	_, err = u.characterRepository.Create(ctx, character_repository.CreateCharacterDTO{
+	_, err = u.characterRepository.Create(ctx, characterrepository.CreateCharacterDTO{
 		UserID: id,
 		Name:   data.CharacterName,
 	})
@@ -83,7 +83,7 @@ func (u *userService) GetByTelegramID(ctx context.Context, id int64) (*models.Us
 	return user, nil
 }
 
-func New(logger *slog.Logger, userRepository user_repository.UserRepository, characterRepository character_repository.CharacterRepository) UserService {
+func New(logger *slog.Logger, userRepository userrepository.UserRepository, characterRepository characterrepository.CharacterRepository) UserService {
 	return &userService{
 		logger:              logger,
 		userRepository:      userRepository,

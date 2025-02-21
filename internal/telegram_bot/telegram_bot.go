@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrTokenNotProvided = errors.New("telegram bot token not priveded")
+	ErrTokenNotProvided = errors.New("telegram bot token not provided")
 )
 
 func New(config *config.Config) (*tgbotapi.BotAPI, error) {

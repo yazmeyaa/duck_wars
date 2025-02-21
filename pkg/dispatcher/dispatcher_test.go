@@ -19,7 +19,7 @@ import (
 func handleTask(_ context.Context, t models.Task) worker.TaskResult {
 	return worker.TaskResult{
 		ID:     t.ID,
-		Result: models.STATUS_COMPLETED,
+		Result: models.StatusCompleted,
 	}
 }
 
@@ -46,9 +46,9 @@ func TestDispatcher(t *testing.T) {
 	newScheduler := scheduler.NewScheduler(db, logger)
 
 	_, err = newScheduler.ScheduleTask(models.Task{
-		Command:    "finish_adventure",
-		Payload:    "forest 1233321",
-		SheduledAt: time.Now().Add(time.Second),
+		Command:     "finish_adventure",
+		Payload:     "forest 1233321",
+		ScheduledAt: time.Now().Add(time.Second),
 	})
 
 	h := map[string]worker.TaskHandler{

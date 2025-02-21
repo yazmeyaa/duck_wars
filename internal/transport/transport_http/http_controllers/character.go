@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/yazmeyaa/ton_game/internal/models"
-	character_service "github.com/yazmeyaa/ton_game/internal/service/character"
-	user_service "github.com/yazmeyaa/ton_game/internal/service/user"
+	characterservice "github.com/yazmeyaa/ton_game/internal/service/character"
+	userservice "github.com/yazmeyaa/ton_game/internal/service/user"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares/auth_middleware"
 )
@@ -39,8 +39,8 @@ type CharacterController interface {
 }
 
 type characterController struct {
-	userService      user_service.UserService
-	characterService character_service.CharacterService
+	userService      userservice.UserService
+	characterService characterservice.CharacterService
 	logger           *slog.Logger
 }
 
@@ -158,7 +158,7 @@ func (c *characterController) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeUserCharacter(w, char)
 }
 
-func NewCharacterController(userService user_service.UserService, characterService character_service.CharacterService, logger *slog.Logger) CharacterController {
+func NewCharacterController(userService userservice.UserService, characterService characterservice.CharacterService, logger *slog.Logger) CharacterController {
 	return &characterController{
 		userService:      userService,
 		characterService: characterService,

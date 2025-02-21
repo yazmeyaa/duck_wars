@@ -19,7 +19,7 @@ func NewRedisClient(cfg *config.Config) (*redis.Client, error) {
 		Username: cfg.Redis.Username,
 	})
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*2))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	_, err := rdb.Ping(ctx).Result()
 	if err != nil {

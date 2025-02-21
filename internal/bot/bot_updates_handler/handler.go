@@ -26,7 +26,7 @@ func (h *BotUpdateHandler) handleCommand(bot *tgbotapi.BotAPI, update *tgbotapi.
 
 	if err != nil {
 		if errors.Is(err, bot_commands_handler.ErrHandlerNotFound) {
-			h.log.Error("Recieved unexpected command.", "command", cmd)
+			h.log.Error("Received unexpected command.", "command", cmd)
 			return
 		}
 		h.log.Error("Error while handling bot command", "error", err.Error())

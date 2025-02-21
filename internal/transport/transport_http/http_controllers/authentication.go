@@ -10,9 +10,9 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	initdata "github.com/telegram-mini-apps/init-data-golang"
-	user_repository "github.com/yazmeyaa/ton_game/internal/repository/user"
-	authorization_service "github.com/yazmeyaa/ton_game/internal/service/authorization"
-	user_service "github.com/yazmeyaa/ton_game/internal/service/user"
+	userrepository "github.com/yazmeyaa/ton_game/internal/repository/user"
+	authorizationservice "github.com/yazmeyaa/ton_game/internal/service/authorization"
+	userservice "github.com/yazmeyaa/ton_game/internal/service/user"
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http"
 )
 
@@ -26,8 +26,8 @@ type AuthResponse struct {
 }
 
 type authenticationController struct {
-	authSvc authorization_service.AuthorizationService
-	userSvc user_service.UserService
+	authSvc authorizationservice.AuthorizationService
+	userSvc userservice.UserService
 	logger  *slog.Logger
 }
 
@@ -87,8 +87,8 @@ func (a *authenticationController) LoginViaTelegramInitData(w http.ResponseWrite
 	user, err := a.userSvc.GetByTelegramID(ctx, data.User.ID)
 
 	var userID int
-	if errors.Is(err, user_repository.ErrUserNotFound) {
-		newUserID, err := a.userSvc.Create(ctx, user_service.CreateUserDTO{
+	if errors.Is(err, userrepository.ErrUserNotFound) {
+		newUserID, err := a.userSvc.Create(ctx, userservice.CreateUserDTO{
 			TelegramID: data.User.ID,
 		})
 		if err != nil {
@@ -173,7 +173,7 @@ func (a *authenticationController) ValidateToken(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusOK)
 }
 
-func NewAuthenticationController(authSvc authorization_service.AuthorizationService, userSvc user_service.UserService, logger *slog.Logger) AuthenticationController {
+func NewAuthenticationController(authSvc authorizationservice.AuthorizationService, userSvc userservice.UserService, logger *slog.Logger) AuthenticationController {
 	return &authenticationController{
 		authSvc: authSvc,
 		userSvc: userSvc,

@@ -121,7 +121,7 @@ func (cr *postgresRepository) GetByID(ctx context.Context, id int) (*models.Char
 	return &char, nil
 }
 
-func (c *postgresRepository) Update(ctx context.Context, id int, data UpdateCharacterDTO) error {
+func (cr *postgresRepository) Update(ctx context.Context, id int, data UpdateCharacterDTO) error {
 	expr := sq.Update(dbName)
 
 	if data.Coins.Valid {
@@ -147,7 +147,7 @@ func (c *postgresRepository) Update(ctx context.Context, id int, data UpdateChar
 
 	_, err := expr.Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar).
-		RunWith(c.db).
+		RunWith(cr.db).
 		ExecContext(ctx)
 
 	return err

@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/yazmeyaa/ton_game/internal/models"
-	character_repository "github.com/yazmeyaa/ton_game/internal/repository/character"
+	characterrepository "github.com/yazmeyaa/ton_game/internal/repository/character"
 )
 
 type characterService struct {
-	characterRepository character_repository.CharacterRepository
+	characterRepository characterrepository.CharacterRepository
 	logger              *slog.Logger
 }
 
@@ -36,13 +36,13 @@ type CharacterService interface {
 	GetByID(id int) (*models.Character, error)
 	GetByUserID(id int) (*models.Character, error)
 	AddExperience(id int, xp float64) error
-	CharacterTextDecsription(char *models.Character) string
+	CharacterTextDescription(char *models.Character) string
 	GetCharacterState(ctx context.Context, characterID int) (*models.CharacterState, error)
 	SpendCharacterEnergy(ctx context.Context, characterID int, energy uint8) error
 	GetCurrentEnergy(ctx context.Context, characterID int) (uint8, error)
 }
 
-func New(characterRepo character_repository.CharacterRepository, logger *slog.Logger) CharacterService {
+func New(characterRepo characterrepository.CharacterRepository, logger *slog.Logger) CharacterService {
 	return &characterService{
 		characterRepository: characterRepo,
 		logger:              logger,
@@ -70,7 +70,7 @@ func (c *characterService) AddExperience(id int, xp float64) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
-	err = c.characterRepository.Update(ctx, id, character_repository.UpdateCharacterDTO{
+	err = c.characterRepository.Update(ctx, id, characterrepository.UpdateCharacterDTO{
 		Experience: sql.NullFloat64{
 			Valid:   true,
 			Float64: char.Experience + xp,
@@ -84,7 +84,7 @@ func (c *characterService) AddExperience(id int, xp float64) error {
 	return err
 }
 
-func (c *characterService) CharacterTextDecsription(char *models.Character) string {
+func (c *characterService) CharacterTextDescription(char *models.Character) string {
 	var sb strings.Builder
 
 	sb.WriteString("Name: ")

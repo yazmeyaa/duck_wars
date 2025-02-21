@@ -18,7 +18,7 @@ func WriteJSON(w http.ResponseWriter, dest any) error {
 	return json.NewEncoder(w).Encode(dest)
 }
 
-// Write an HTTP error wtith provided status code and message in JSON
+// WriteError Write an HTTP error with provided status code and message in JSON
 // {"error": errorMsg}
 func WriteError(w http.ResponseWriter, code int, errorMsg string) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -34,7 +34,7 @@ func handleParseError(w http.ResponseWriter, logger *slog.Logger, fn string, err
 	return err
 }
 
-// Parse any JSON struct. Provide only reference to structs as dest
+// ParseJSON Parse any JSON struct. Provide only reference to structs as dest
 func ParseJSON(dest any, w http.ResponseWriter, r *http.Request, logger *slog.Logger, fn string) error {
 	err := json.NewDecoder(r.Body).Decode(&dest)
 	defer func() {
