@@ -13,7 +13,7 @@ import (
 var (
 	ErrItemNotFound         = errors.New("item not found")
 	ErrRecipeNotFound       = errors.New("not found reciepe")
-	ErrNotEnoughIngredients = errors.New("not enought ingredients")
+	ErrNotEnoughIngredients = errors.New("not enough ingredients")
 )
 
 type ItemsService interface {
@@ -75,8 +75,9 @@ func (i *itemsService) Craft(ctx context.Context, characterID int, recipeID stri
 	return nil
 }
 
-// Destroyц implements ItemsService.
+// Destroy implements ItemsService.
 func (i *itemsService) Destroy(ctx context.Context, characterID int, itemID string, quantity uint16) error {
+	// TODO: IMPLEMENT THIS
 	panic("unimplemented")
 }
 

@@ -41,7 +41,10 @@ func AuthMiddleware(logger *slog.Logger, a authorization_service.AuthorizationSe
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			auth := r.Header.Get("Authorization")
 			if auth == "" {
-				transport_http.WriteError(w, http.StatusBadRequest, "Missed authorization data.")
+				err := transport_http.WriteError(w, http.StatusBadRequest, "Missed authorization data.")
+				if err != nil {
+					return
+				}
 				return
 			}
 
@@ -55,7 +58,10 @@ func AuthMiddleware(logger *slog.Logger, a authorization_service.AuthorizationSe
 			sub, err := claims.GetSubject()
 			if err != nil {
 				logger.Error("Error while get issuer from JWT claims...", "error", err.Error())
-				transport_http.WriteError(w, http.StatusInternalServerError, "Internal error, please try again later...")
+				err := transport_http.WriteError(w, http.StatusInternalServerError, "Internal error, please try again later...")
+				if err != nil {
+					return
+				}
 				return
 			}
 

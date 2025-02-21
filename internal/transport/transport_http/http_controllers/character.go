@@ -49,7 +49,10 @@ func (c *characterController) GetState(w http.ResponseWriter, r *http.Request) {
 	userID, err := auth_middleware.GetUserIDFromRequest(r)
 	if err != nil {
 		c.logger.Error("Error while get user id from request context", "error", err.Error())
-		transport_http.WriteInternalError(w)
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
@@ -58,14 +61,20 @@ func (c *characterController) GetState(w http.ResponseWriter, r *http.Request) {
 	char, err := c.characterService.GetByUserID(userID)
 	if err != nil {
 		c.logger.Error("Cannot get character", "error", err.Error())
-		transport_http.WriteError(w, http.StatusNotFound, "Cannot find character linked to user.")
+		err := transport_http.WriteError(w, http.StatusNotFound, "Cannot find character linked to user.")
+		if err != nil {
+			return
+		}
 		return
 	}
 
 	state, err := c.userService.GetState(ctx, char.ID)
 	if err != nil {
 		c.logger.Error("Cannot get user state", "error", err.Error())
-		transport_http.WriteInternalError(w)
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
 		return
 	}
 
@@ -98,7 +107,10 @@ func writeUserState(w http.ResponseWriter, state *models.CharacterState) {
 	}
 
 	if err := transport_http.WriteJSON(w, &response); err != nil {
-		transport_http.WriteInternalError(w)
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
 	}
 }
 
@@ -107,12 +119,18 @@ func (c *characterController) Get(w http.ResponseWriter, r *http.Request) {
 	userID, err := auth_middleware.GetUserIDFromRequest(r)
 	if err != nil {
 		c.logger.Error("Error while get user id from request context", "error", err.Error())
-		transport_http.WriteInternalError(w)
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
 		return
 	}
 	char, err := c.characterService.GetByUserID(userID)
 	if err != nil {
-		transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get user character.")
+		err := transport_http.WriteError(w, http.StatusInternalServerError, "Cannot get user character.")
+		if err != nil {
+			return
+		}
 		return
 	}
 

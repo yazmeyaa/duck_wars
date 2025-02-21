@@ -2,6 +2,7 @@ package dispatcher_test
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 	"os"
 	"testing"
@@ -15,7 +16,7 @@ import (
 	"github.com/yazmeyaa/ton_game/pkg/worker"
 )
 
-func handleTask(ctx context.Context, t models.Task) worker.TaskResult {
+func handleTask(_ context.Context, t models.Task) worker.TaskResult {
 	return worker.TaskResult{
 		ID:     t.ID,
 		Result: models.STATUS_COMPLETED,
@@ -35,11 +36,16 @@ func TestDispatcher(t *testing.T) {
 		t.FailNow()
 		return
 	}
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			logger.Error(err.Error())
+		}
+	}(db)
 
-	sheduler := sheduler.NewSheduler(db, logger)
+	newScheduler := scheduler.NewScheduler(db, logger)
 
-	_, err = sheduler.SheduleTask(models.Task{
+	_, err = newScheduler.ScheduleTask(models.Task{
 		Command:    "finish_adventure",
 		Payload:    "forest 1233321",
 		SheduledAt: time.Now().Add(time.Second),

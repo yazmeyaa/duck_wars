@@ -51,11 +51,17 @@ func (i *postgresRepository) TransferItems(ctx context.Context, fromID int, toID
 	}
 
 	if err := i.removeItems(ctx, tx, fromID, items); err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 	if err := i.addItems(ctx, tx, toID, items); err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 
@@ -81,7 +87,10 @@ func (i *postgresRepository) CraftItems(ctx context.Context, characterID int, it
 	removeItemsIds := i.getItemsIds(itemsToRemove)
 	availableItems, err := i.getItems(ctx, tx, characterID, removeItemsIds)
 	if err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 
@@ -100,18 +109,27 @@ func (i *postgresRepository) CraftItems(ctx context.Context, characterID int, it
 			}
 		}
 		if !isAvailable {
-			tx.Rollback()
+			err := tx.Rollback()
+			if err != nil {
+				return err
+			}
 			return ErrNotEnoughtItems
 		}
 	}
 
 	if err := i.removeItems(ctx, tx, characterID, itemsToRemove); err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 
 	if err := i.addItems(ctx, tx, characterID, itemsToAdd); err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 
@@ -207,12 +225,21 @@ func (r *postgresRepository) UpdateQuantity(ctx context.Context, characterID int
 
 	defer func() {
 		if p := recover(); p != nil {
-			tx.Rollback()
+			err := tx.Rollback()
+			if err != nil {
+				return
+			}
 			panic(p)
 		} else if err != nil {
-			tx.Rollback()
+			err := tx.Rollback()
+			if err != nil {
+				return
+			}
 		} else {
-			tx.Commit()
+			err := tx.Commit()
+			if err != nil {
+				return
+			}
 		}
 	}()
 
@@ -244,7 +271,12 @@ func (i *postgresRepository) GetInventory(ctx context.Context, characterID int) 
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			return
+		}
+	}(rows)
 
 	var items []models.InventoryItem
 

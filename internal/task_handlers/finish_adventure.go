@@ -153,7 +153,12 @@ func processFailedAdventure(gd *game_data.GameData, payload game_data.AdventureT
 
 func sendMessage(bot *tgbotapi.BotAPI, userID int64, message string) {
 	msg := tgbotapi.NewMessage(userID, message)
-	go bot.Send(msg)
+	go func() {
+		_, err := bot.Send(msg)
+		if err != nil {
+			return
+		}
+	}()
 }
 
 func finishAdventureHandler(bot *tgbotapi.BotAPI, logger *slog.Logger, gd *game_data.GameData, charService character_service.CharacterService, inventoryService inventory_service.InventoryService) worker.TaskHandler {

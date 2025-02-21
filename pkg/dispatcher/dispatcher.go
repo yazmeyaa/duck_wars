@@ -61,10 +61,18 @@ func (d *Dispatcher) loadTasks() ([]models.Task, error) {
 		"SELECT id, command, payload, status, sheduled_at, created_at FROM tasks WHERE sheduled_at <= NOW() AND status = 'pending' FOR UPDATE SKIP LOCKED",
 	)
 	if err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return nil, err
+		}
 		return nil, err
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			return
+		}
+	}(rows)
 
 	tasks := make([]models.Task, 0)
 
@@ -78,7 +86,10 @@ func (d *Dispatcher) loadTasks() ([]models.Task, error) {
 			&task.SheduledAt,
 			&task.CreatedAt,
 		); err != nil {
-			tx.Rollback()
+			err := tx.Rollback()
+			if err != nil {
+				return nil, err
+			}
 			return nil, err
 		}
 
@@ -87,7 +98,10 @@ func (d *Dispatcher) loadTasks() ([]models.Task, error) {
 
 	for _, task := range tasks {
 		if _, err := tx.Exec("UPDATE tasks SET status = 'processing' WHERE id = $1", task.ID); err != nil {
-			tx.Rollback()
+			err := tx.Rollback()
+			if err != nil {
+				return nil, err
+			}
 			return nil, err
 		}
 	}
@@ -153,7 +167,7 @@ func (d *Dispatcher) Run() {
 func (d *Dispatcher) shutdown() {
 	close(d.taskChan)
 	close(d.taskResultChan)
-	for _, worker := range d.workers {
-		worker.Stop()
+	for _, w := range d.workers {
+		w.Stop()
 	}
 }
