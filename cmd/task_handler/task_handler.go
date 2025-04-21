@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/yazmeyaa/ton_game/internal/redis"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -33,6 +34,11 @@ func main() {
 		os.Exit(1)
 		return
 	}
+	rdb, err := redis.NewRedisClient(cfg)
+	if err != nil {
+		appLogger.Error("[Task handler]: Error while connect to redis", "error", err.Error())
+		os.Exit(1)
+	}
 	gd := game_data.NewGameData(appLogger)
 	if err := gd.ReadFolderDefaultFiles(resourcesFilePath); err != nil {
 		appLogger.Error("Error while reading game data files.", "error", err.Error())
@@ -46,7 +52,7 @@ func main() {
 		return
 	}
 
-	charRepo := characterRepository.NewPostgres(db)
+	charRepo := characterRepository.NewPostgres(db, rdb, appLogger)
 	charService := characterService.New(charRepo, appLogger)
 	inventoryRepo := inventoryRepository.New(db)
 	inventorySvc := inventoryService.New(inventoryRepo, appLogger)

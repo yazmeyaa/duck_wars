@@ -20,7 +20,7 @@ type Scheduler struct {
 }
 
 func (s *Scheduler) ScheduleTask(task models.Task) (id string, err error) {
-	row := s.db.QueryRow("INSERT INTO tasks (command, payload, sheduled_at, status) VALUES ($1, $2, $3, 'pending') RETURNING id",
+	row := s.db.QueryRow("INSERT INTO tasks (command, payload, scheduled_at, status) VALUES ($1, $2, $3, 'pending') RETURNING id",
 		task.Command,
 		task.Payload,
 		task.ScheduledAt,

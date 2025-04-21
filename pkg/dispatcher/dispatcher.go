@@ -58,7 +58,7 @@ func (d *Dispatcher) loadTasks() ([]models.Task, error) {
 	}
 
 	rows, err := tx.Query(
-		"SELECT id, command, payload, status, sheduled_at, created_at FROM tasks WHERE sheduled_at <= NOW() AND status = 'pending' FOR UPDATE SKIP LOCKED",
+		"SELECT id, command, payload, status, scheduled_at, created_at FROM tasks WHERE scheduled_at <= NOW() AND status = 'pending' FOR UPDATE SKIP LOCKED",
 	)
 	if err != nil {
 		err := tx.Rollback()

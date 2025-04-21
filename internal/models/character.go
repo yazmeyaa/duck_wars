@@ -3,12 +3,12 @@ package models
 import "time"
 
 type Character struct {
-	ID         int
-	UserID     int
-	Name       string
-	Coins      float64
-	MaxEnergy  uint8
-	Experience float64
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	ID         int       `redis:"id"`
+	UserID     int       `redis:"user_id"`
+	Name       string    `redis:"name"`
+	Coins      float64   `redis:"coins"`
+	MaxEnergy  uint8     `redis:"max_energy"`
+	Experience float64   `redis:"experience"`
+	CreatedAt  time.Time `redis:"created_at"`
+	UpdatedAt  time.Time `redis:"updated_at"`
 }

@@ -15,13 +15,21 @@ func newCharactersHandler(characterController http_controllers.CharacterControll
 
 	router.Handle("GET /me", middlewares.ApplyMiddleware(
 		http.HandlerFunc(characterController.Get),
-		auth_middleware.AuthMiddleware(logger, authorizationService)),
+		auth_middleware.AuthMiddleware(logger, authorizationService),
+	),
 	)
 	router.Handle("GET /state", middlewares.ApplyMiddleware(
 		http.HandlerFunc(characterController.GetState),
 		auth_middleware.AuthMiddleware(logger, authorizationService)),
 	)
 	router.HandleFunc("GET /{id}", characterController.GetByID)
+
+	router.Handle("GET /inventory",
+		middlewares.ApplyMiddleware(
+			http.HandlerFunc(characterController.GetInventory),
+			auth_middleware.AuthMiddleware(logger, authorizationService),
+		),
+	)
 
 	return router
 }

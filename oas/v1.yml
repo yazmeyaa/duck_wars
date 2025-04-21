@@ -1,0 +1,255 @@
+openapi: 3.0.0
+info:
+  title: CraftWars API
+  version: 0.0.1
+paths:
+  /v1/auth/login/telegram:
+    description: "Authenticate via telegram init data"
+    post:
+      tags:
+        - Authentication
+      responses:
+        200:
+          $ref: "#/components/responses/AuthenticationResponse"
+        403:
+          $ref: "#/components/responses/DefaultError"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+
+  /v1/adventures:
+    description: "In game adventures"
+    get:
+      tags:
+        - Adventures
+      summary: "Get list"
+      description: "Get list of all available adventures"
+      responses:
+        200:
+          $ref: "#/components/responses/AdventuresListResponse"
+        400:
+          $ref: "#/components/responses/DefaultError"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+
+  /v1/adventures/{adventure_id}:
+    post:
+      security:
+        - BearerAuth: [ ]
+      tags:
+        - Adventures
+      parameters:
+        - name: "adventure_id"
+          in: path
+          required: true
+          schema:
+            type: string
+      description: "Send character to the adventure"
+      summary: "Go to adventure"
+      responses:
+        204:
+          description: "Character has successfully set off to the adventure"
+        400:
+          $ref: "#/components/responses/DefaultError"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+
+  /v1/items:
+    get:
+      summary: "Get items"
+      description: "Get list of all items in the game"
+      tags:
+        - Items
+        - "Game resources"
+      responses:
+        200:
+          $ref: "#/components/responses/ItemsResponse"
+
+  /v1/characters:
+    get:
+      summary: "Get character"
+      description: "Get character for current user. It requires a tolen in headers."
+      security:
+        - BearerAuth: [ ]
+      tags:
+        - Characters
+      responses:
+        200:
+          $ref: "#/components/responses/GetCharacterResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+  /v1/characters/{character_id}:
+    get:
+      summary: "Get character by id"
+      description: "Get character by character_id param"
+      security:
+        - BearerAuth: [ ]
+      tags:
+        - Characters
+      parameters:
+        - name: "character_id"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/GetCharacterResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+  /v1/characters/state:
+    get:
+      summary: "Get chararcter's state"
+      description: "Get character's actual state"
+      security:
+        - BearerAuth: []
+      tags:
+        - Characters
+      responses:
+        200:
+          $ref: "#/components/responses/GetCharacterStateResponse"
+        401:
+          $ref: "#/components/responses/UnauthorizedResponse"
+
+components:
+  responses:
+    AdventuresListResponse:
+      description: List of and adventures
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Adventure"
+
+    DefaultError:
+      description: "Default server error. Contains \"error\" field with error cause"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+
+    GetCharacterStateResponse:
+      description: "Get character state"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CharacterState"
+
+    ItemsResponse:
+      description: "List of in-game items"
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Item"
+
+    UnauthorizedResponse:
+      description: "Missed token in headers or not valid/expired token provided."
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              "error":
+                type: string
+
+    InternalServerError:
+      description: "Internal server error means that some error was happened on server-side, not your fault anyway"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              "error":
+                type: string
+
+    AuthenticationResponse:
+      description: "If authentication was successful server response JSON with token inside"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+
+    GetCharacterResponse:
+      description: "Get character info"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Character"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Character:
+      title: "Character"
+      description: "Character"
+      type: object
+      properties:
+        id:
+          type: integer
+        userID:
+          type: integer
+        name:
+          type: string
+        coins:
+          type: number
+        maxEnergy:
+          type: integer
+        experience:
+          type: number
+
+    Adventure:
+      title: "Adventure"
+      description: "In game adventure information"
+      type: object
+      properties:
+        adventure_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        duration:
+          type: integer
+        energyCost:
+          type: integer
+
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+
+    CharacterState:
+      title: "Character state"
+      type: object
+      properties:
+        energy:
+          type: integer
+        spendEnergyAt:
+          type: string
+        state:
+          type: string
+          enum:
+            - "idle"
+            - "adventure"
+            - "crafting"

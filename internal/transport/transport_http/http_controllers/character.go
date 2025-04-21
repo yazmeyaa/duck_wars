@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	inventoryservice "github.com/yazmeyaa/ton_game/internal/service/inventory"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -17,6 +18,10 @@ import (
 	"github.com/yazmeyaa/ton_game/internal/transport/transport_http/middlewares/auth_middleware"
 )
 
+type getInventoryItemResponse struct {
+	ItemID   string `json:"itemId"`
+	Quantity uint16 `json:"quantity"`
+}
 type getCharacterResponse struct {
 	ID         int     `json:"id"`
 	UserID     int     `json:"userId"`
@@ -36,12 +41,61 @@ type CharacterController interface {
 	Get(w http.ResponseWriter, r *http.Request)
 	GetByID(w http.ResponseWriter, r *http.Request)
 	GetState(w http.ResponseWriter, r *http.Request)
+	GetInventory(w http.ResponseWriter, r *http.Request)
 }
 
 type characterController struct {
 	userService      userservice.UserService
 	characterService characterservice.CharacterService
+	inventoryService inventoryservice.InventoryService
 	logger           *slog.Logger
+}
+
+func (c *characterController) GetInventory(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	userID, err := auth_middleware.GetUserIDFromRequest(r)
+	if err != nil {
+		c.logger.Error("Error while extracting userID from request context", "error", err.Error())
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
+		return
+	}
+	char, err := c.characterService.GetByUserID(userID)
+	if err != nil {
+		c.logger.Error("Error while getting character.", "error", err.Error())
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
+		return
+	}
+	inv, err := c.inventoryService.GetInventory(ctx, char.ID)
+	if err != nil {
+		c.logger.Error("Error while getting inventory", "error", err.Error())
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
+		return
+	}
+
+	res := make([]getInventoryItemResponse, len(inv))
+	for idx, item := range inv {
+		res[idx] = getInventoryItemResponse{
+			ItemID:   item.ItemID,
+			Quantity: item.Quantity,
+		}
+	}
+
+	if err := transport_http.WriteJSON(w, res); err != nil {
+		err := transport_http.WriteInternalError(w)
+		if err != nil {
+			return
+		}
+	}
 }
 
 // GetState implements CharacterController.
@@ -158,10 +212,16 @@ func (c *characterController) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeUserCharacter(w, char)
 }
 
-func NewCharacterController(userService userservice.UserService, characterService characterservice.CharacterService, logger *slog.Logger) CharacterController {
+func NewCharacterController(
+	userService userservice.UserService,
+	characterService characterservice.CharacterService,
+	inventoryService inventoryservice.InventoryService,
+	logger *slog.Logger,
+) CharacterController {
 	return &characterController{
 		userService:      userService,
 		characterService: characterService,
+		inventoryService: inventoryService,
 		logger:           logger,
 	}
 }

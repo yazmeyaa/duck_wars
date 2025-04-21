@@ -7,8 +7,8 @@ import (
 
 type State string
 
-func (s *State) MarshalBinary() (data []byte, err error) {
-	return []byte(*s), nil
+func (s State) MarshalBinary() (data []byte, err error) {
+	return []byte(s), nil
 }
 
 func (s *State) UnmarshalBinary(data []byte) error {

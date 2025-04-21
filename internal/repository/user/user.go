@@ -48,7 +48,6 @@ func (r *postgresRepository) createState(ctx context.Context, key string) (*mode
 		SpendEnergyAt: time.Now(),
 		State:         models.StateIdle,
 	}
-
 	_, err := r.rc.HSet(ctx, key, &res).Result()
 
 	if err != nil {

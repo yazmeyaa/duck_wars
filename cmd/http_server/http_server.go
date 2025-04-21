@@ -1,6 +1,8 @@
 package main
 
 import (
+	inventoryrepository "github.com/yazmeyaa/ton_game/internal/repository/inventory"
+	inventoryservice "github.com/yazmeyaa/ton_game/internal/service/inventory"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -44,14 +46,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	characterRepo := characterRepository.NewPostgres(db)
+	characterRepo := characterRepository.NewPostgres(db, rdb, appLogger)
+	inventoryRepo := inventoryrepository.New(db)
 	userRepo := userRepository.New(db, rdb, gd)
 	userSvc := userService.New(appLogger, userRepo, characterRepo)
+	inventorySvc := inventoryservice.New(inventoryRepo, appLogger)
 	characterSvc := characterService.New(characterRepo, appLogger)
-	characterController := http_controllers.NewCharacterController(userSvc, characterSvc, appLogger)
+	characterController := http_controllers.NewCharacterController(userSvc, characterSvc, inventorySvc, appLogger)
 	authSvc := authorizationService.New(cfg)
 	authController := http_controllers.NewAuthenticationController(authSvc, userSvc, appLogger)
-	resourcesController := http_controllers.NewResourcesController(gd, appLogger)
+	resourcesController := http_controllers.NewResourcesController(gd, rdb, appLogger)
 	router := http_router.New(http_router.RouterConstructor{
 		CharacterController:      characterController,
 		AuthenticationController: authController,

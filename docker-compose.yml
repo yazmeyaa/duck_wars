@@ -17,6 +17,7 @@ services:
     ]
 
   http_server:
+    container_name: http_server
     env_file:
       - .env
     environment:
@@ -44,6 +45,7 @@ services:
         condition: service_completed_successfully
 
   task_handler:
+    container_name: task_handler
     env_file:
       - .env
     environment:
@@ -68,6 +70,7 @@ services:
         condition: service_completed_successfully
 
   telegram_bot:
+    container_name: telegram_bot
     env_file:
       - .env
     environment:
@@ -129,6 +132,33 @@ services:
       - '6379:6379'
     volumes: 
       - cache:/data
+  swagger-ui:
+    image: swaggerapi/swagger-ui:v5.17.14
+    container_name: "swagger-ui"
+    ports:
+      - "${SWAGGER_UI_HOST_PORT}:8080"
+    networks:
+      - app
+    volumes:
+      - ./oas:/oas
+    environment:
+      BASE_URL: "/swagger"
+      SWAGGER_JSON: "/oas/v1.yml"
+
+  nginx:
+    container_name: "nginx"
+    image: nginx:1-alpine
+    networks:
+      - app
+    environment:
+      - SWAGGER_UI_HOST_PORT=${SWAGGER_UI_HOST_PORT}
+    ports:
+      - "8089:80"
+    depends_on:
+      - http_server
+      - swagger-ui
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
 
 volumes:
   db_data:
